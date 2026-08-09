@@ -3,10 +3,10 @@
 <h3>Admin Dashboard</h3>
 <div class="row mb-4">
     <div class="col-md-3">
-        <div class="card text-center p-3">Total Treks<h4>{{ treks|length }}</h4></div>
+        <div class="card text-center p-3">Total Treks<h4>{{ total_treks }}</h4></div>
     </div>
     <div class="col-md-3">
-        <div class="card text-center p-3">Total Users<h4>{{ total_users }}</h4></div>
+        <div class="card text-center p-3">Users / Staff<h4>{{ total_users }} / {{ total_staff }}</h4></div>
     </div>
     <div class="col-md-3">
         <div class="card text-center p-3">Active Bookings<h4>{{ total_bookings }}</h4></div>
@@ -15,7 +15,18 @@
         <div class="card text-center p-3">Pending Staff<h4>{{ pending|length }}</h4></div>
     </div>
 </div>
-<a href="{{ url_for('add_trek') }}" class="btn btn-dark mb-3">Add New Trek</a>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <form method="get" class="d-flex">
+            <input type="text" name="q" class="form-control me-2" placeholder="Search trek by name or ID" value="{{ q }}">
+            <button class="btn btn-dark">Search</button>
+        </form>
+    </div>
+    <div class="col-md-6 text-end">
+        <a href="{{ url_for('add_trek') }}" class="btn btn-dark">Add New Trek</a>
+        <a href="{{ url_for('all_bookings') }}" class="btn btn-secondary">View All Bookings</a>
+    </div>
+</div>
 <table class="table table-bordered">
     <tr>
         <th>ID</th><th>Name</th><th>Location</th><th>Difficulty</th><th>Duration</th>

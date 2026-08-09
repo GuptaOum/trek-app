@@ -67,6 +67,7 @@ erDiagram
         int duration
         int price
         string start_date
+        string end_date
         int total_slots
         int available_slots
         string description
@@ -118,7 +119,8 @@ The `role` column decides whether a User row is an admin, a staff or a trekker. 
 | `/admin/staff` | GET | Pending requests and the approved staff list |
 | `/admin/staff/approve/<uid>` | GET | Approve a staff request |
 | `/admin/staff/reject/<uid>` | GET | Reject and remove a staff request |
-| `/admin/users` | GET | List of all registered trekkers |
+| `/admin/users` | GET | List of all registered trekkers, searchable by name or ID |
+| `/admin/bookings` | GET | Every booking in the system, searchable |
 | `/admin/block/<uid>` | GET | Block or unblock a user or a staff |
 
 ### Trek Staff
@@ -133,12 +135,13 @@ The `role` column decides whether a User row is an admin, a staff or a trekker. 
 | Endpoint | Method | Description |
 |---|---|---|
 | `/dashboard` | GET | Booking history of the logged in user |
+| `/profile` | GET, POST | Edit own name, email, phone and password |
 | `/book/<tid>` | POST | Book slots on a trek |
 | `/cancel/<bid>` | GET | Cancel a booking and return the slots |
 
 ## Features Implemented
 
-**Overbooking prevention.** The booking route rejects the request if the members asked for are more than `available_slots`, and reduces `available_slots` in the same commit as the booking. A user cannot book the same trek twice while an active booking exists, and booking is closed unless the trek status is Upcoming.
+**Overbooking prevention.** The booking route rejects the request if the members asked for are more than `available_slots`, and reduces `available_slots` in the same commit as the booking. A user cannot book the same trek twice while an active booking exists, and booking is closed unless the trek status is Open.
 
 **Slot editing is safe.** When the admin or the staff changes the total slots, the application first works out how many seats are already booked and refuses any value below that number. The available slots are then recalculated instead of being overwritten.
 
@@ -151,6 +154,8 @@ The `role` column decides whether a User row is an admin, a staff or a trekker. 
 **Booking history.** Cancelling does not delete the row, it only changes the status to Cancelled and adds the seats back, so the full history stays visible. When a staff marks a trek as Completed all its active bookings also become Completed.
 
 **Search and filter.** The home page searches the trek name and location with a LIKE query and filters by difficulty, both done in Flask without any JavaScript.
+
+**Trek status flow.** A trek moves through Pending, Approved, Open, Closed and Completed. It is created as Pending and stays hidden from trekkers until the admin approves it, only an Open trek can be booked, and the assigned guide moves it to Closed or Completed.
 
 ## Database
 

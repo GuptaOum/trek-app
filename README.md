@@ -16,9 +16,13 @@ The application solves one main problem: keeping the slot count of a trek correc
 
 | Role | Can do |
 |---|---|
-| **Admin** | Create, edit and delete treks. Approve or reject guide requests. Assign guides to treks. Block users and guides. |
-| **Trek Staff** | Register on their own, wait for admin approval, then manage only the treks assigned to them, update slots and status, and view participants. |
-| **Trekker** | Register, search and filter treks, book slots, cancel a booking, and see their full booking history. |
+| **Admin** | Create, edit and delete treks. Approve or reject guide requests. Assign guides to treks. Search treks, guides and users by name or ID. View every booking. Block users and guides. |
+| **Trek Staff** | Register on their own, wait for admin approval, then manage only the treks assigned to them, update slots and status, and view the participant list with the number registered per trek. |
+| **Trekker** | Register, search and filter treks by name, location and difficulty, book slots, cancel a booking, edit their profile, and see their full booking history. |
+
+### Trek status
+
+A trek moves through `Pending`, `Approved`, `Open`, `Closed` and `Completed`. New treks start as `Pending` and stay hidden from trekkers until the admin approves them. Only a trek that is `Open` can be booked, and only the assigned guide can move it to `Closed` or `Completed`.
 
 ---
 
@@ -116,6 +120,7 @@ erDiagram
         int duration
         int price
         string start_date
+        string end_date
         int total_slots
         int available_slots
         string description
@@ -161,7 +166,8 @@ There is a single `User` table for all three roles because all of them log in th
 | `/admin/staff` | GET | Pending and approved guides |
 | `/admin/staff/approve/<id>` | GET | Approve a guide |
 | `/admin/staff/reject/<id>` | GET | Reject a guide |
-| `/admin/users` | GET | All registered trekkers |
+| `/admin/users` | GET | All registered trekkers, searchable |
+| `/admin/bookings` | GET | Every booking, searchable |
 | `/admin/block/<id>` | GET | Block or unblock |
 
 ### Trek staff
@@ -176,6 +182,7 @@ There is a single `User` table for all three roles because all of them log in th
 | Endpoint | Method | Description |
 |---|---|---|
 | `/dashboard` | GET | Booking history |
+| `/profile` | GET, POST | Edit name, email, phone and password |
 | `/book/<id>` | POST | Book slots |
 | `/cancel/<id>` | GET | Cancel and return the slots |
 

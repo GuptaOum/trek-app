@@ -10,6 +10,7 @@
             <li class="list-group-item">Duration: {{ trek.duration }} days</li>
             <li class="list-group-item">Price: Rs {{ trek.price }}</li>
             <li class="list-group-item">Start Date: {{ trek.start_date }}</li>
+            <li class="list-group-item">End Date: {{ trek.end_date }}</li>
             <li class="list-group-item">Available Slots: {{ trek.available_slots }}</li>
             <li class="list-group-item">Status: {{ trek.status }}</li>
             <li class="list-group-item">Guide: {% if trek.staff %}{{ trek.staff.name }}{% else %}To be assigned{% endif %}</li>
@@ -17,7 +18,7 @@
     </div>
     <div class="col-md-4">
         {% if user and user.role == 'user' %}
-            {% if trek.status == 'Upcoming' and trek.available_slots > 0 %}
+            {% if trek.status == 'Open' and trek.available_slots > 0 %}
             <form method="post" action="{{ url_for('book_trek', tid=trek.id) }}">
                 <div class="mb-3">
                     <label class="form-label">Number of Members</label>

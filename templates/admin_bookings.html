@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>All Bookings</h3>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-5">
+        <input type="text" name="q" class="form-control" placeholder="Search by user name, trek name or booking ID" value="{{ q }}">
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-dark">Search</button>
+    </div>
+</form>
+<table class="table table-bordered">
+    <tr><th>ID</th><th>User</th><th>Trek</th><th>Location</th><th>Members</th><th>Booked On</th><th>Status</th></tr>
+    {% for b in bookings %}
+    <tr>
+        <td>{{ b.id }}</td>
+        <td>{{ b.user.name }}</td>
+        <td>{{ b.trek.name }}</td>
+        <td>{{ b.trek.location }}</td>
+        <td>{{ b.members }}</td>
+        <td>{{ b.booked_on }}</td>
+        <td>{{ b.status }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No bookings found</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

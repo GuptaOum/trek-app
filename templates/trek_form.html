@@ -17,7 +17,7 @@
                 <select name="difficulty" class="form-select">
                     <option value="Easy" {% if trek and trek.difficulty == 'Easy' %}selected{% endif %}>Easy</option>
                     <option value="Moderate" {% if trek and trek.difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
-                    <option value="Difficult" {% if trek and trek.difficulty == 'Difficult' %}selected{% endif %}>Difficult</option>
+                    <option value="Hard" {% if trek and trek.difficulty == 'Hard' %}selected{% endif %}>Hard</option>
                 </select>
             </div>
             <div class="mb-3">
@@ -32,6 +32,22 @@
                 <label class="form-label">Start Date</label>
                 <input type="date" name="start_date" class="form-control" value="{{ trek.start_date if trek else '' }}">
             </div>
+            <div class="mb-3">
+                <label class="form-label">End Date</label>
+                <input type="date" name="end_date" class="form-control" value="{{ trek.end_date if trek else '' }}">
+            </div>
+            {% if trek %}
+            <div class="mb-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+                    <option value="Pending" {% if trek.status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Approved" {% if trek.status == 'Approved' %}selected{% endif %}>Approved</option>
+                    <option value="Open" {% if trek.status == 'Open' %}selected{% endif %}>Open</option>
+                    <option value="Closed" {% if trek.status == 'Closed' %}selected{% endif %}>Closed</option>
+                    <option value="Completed" {% if trek.status == 'Completed' %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+            {% endif %}
             <div class="mb-3">
                 <label class="form-label">Total Slots</label>
                 <input type="number" name="total_slots" class="form-control" value="{{ trek.total_slots if trek else '' }}" required>

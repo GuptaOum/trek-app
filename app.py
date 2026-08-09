@@ -21,7 +21,7 @@ def home():
     user = current_user()
     q = request.args.get('q', '')
     difficulty = request.args.get('difficulty', '')
-    treks = Trek.query.filter(Trek.status != 'Cancelled')
+    treks = Trek.query.filter(Trek.status.in_(['Approved', 'Open']))
     if q:
         treks = treks.filter(db.or_(Trek.name.like('%' + q + '%'), Trek.location.like('%' + q + '%')))
     if difficulty:
@@ -108,13 +108,38 @@ def logout():
 def admin_dashboard():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
-    treks = Trek.query.all()
+    q = request.args.get('q', '')
+    treks = Trek.query
+    if q:
+        if q.isdigit():
+            treks = treks.filter_by(id=int(q))
+        else:
+            treks = treks.filter(Trek.name.like('%' + q + '%'))
+    treks = treks.all()
     pending = User.query.filter_by(role='staff', approved=False).all()
     total_users = User.query.filter_by(role='user').count()
+    total_staff = User.query.filter_by(role='staff').count()
+    total_treks = Trek.query.count()
     total_bookings = Booking.query.filter_by(status='Booked').count()
     return render_template('admin_dashboard.html', treks=treks, pending=pending,
-                           total_users=total_users, total_bookings=total_bookings,
-                           user=current_user())
+                           total_users=total_users, total_staff=total_staff,
+                           total_treks=total_treks, total_bookings=total_bookings,
+                           q=q, user=current_user())
+
+
+@app.route('/admin/bookings')
+def all_bookings():
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    q = request.args.get('q', '')
+    bookings = Booking.query.join(Trek).join(User, Booking.user_id == User.id)
+    if q:
+        if q.isdigit():
+            bookings = bookings.filter(Booking.id == int(q))
+        else:
+            bookings = bookings.filter(db.or_(User.name.like('%' + q + '%'), Trek.name.like('%' + q + '%')))
+    bookings = bookings.all()
+    return render_template('admin_bookings.html', bookings=bookings, q=q, user=current_user())
 
 
 @app.route('/admin/trek/add', methods=['GET', 'POST'])
@@ -129,10 +154,11 @@ def add_trek():
                  duration=int(request.form['duration']),
                  price=int(request.form['price']),
                  start_date=request.form['start_date'],
+                 end_date=request.form['end_date'],
                  total_slots=slots,
                  available_slots=slots,
                  description=request.form['description'],
-                 status='Upcoming')
+                 status='Pending')
         db.session.add(t)
         db.session.commit()
         flash('Trek added')
@@ -157,9 +183,11 @@ def edit_trek(tid):
         trek.duration = int(request.form['duration'])
         trek.price = int(request.form['price'])
         trek.start_date = request.form['start_date']
+        trek.end_date = request.form['end_date']
         trek.total_slots = new_total
         trek.available_slots = new_total - booked
         trek.description = request.form['description']
+        trek.status = request.form['status']
         db.session.commit()
         flash('Trek updated')
         return redirect(url_for('admin_dashboard'))
@@ -204,9 +232,16 @@ def assign_staff(tid):
 def manage_staff():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
+    q = request.args.get('q', '')
     pending = User.query.filter_by(role='staff', approved=False).all()
-    approved = User.query.filter_by(role='staff', approved=True).all()
-    return render_template('admin_staff.html', pending=pending, approved=approved, user=current_user())
+    approved = User.query.filter_by(role='staff', approved=True)
+    if q:
+        if q.isdigit():
+            approved = approved.filter_by(id=int(q))
+        else:
+            approved = approved.filter(User.name.like('%' + q + '%'))
+    approved = approved.all()
+    return render_template('admin_staff.html', pending=pending, approved=approved, q=q, user=current_user())
 
 
 @app.route('/admin/staff/approve/<int:uid>')
@@ -235,8 +270,15 @@ def reject_staff(uid):
 def manage_users():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
-    users = User.query.filter_by(role='user').all()
-    return render_template('admin_users.html', users=users, user=current_user())
+    q = request.args.get('q', '')
+    users = User.query.filter_by(role='user')
+    if q:
+        if q.isdigit():
+            users = users.filter_by(id=int(q))
+        else:
+            users = users.filter(User.name.like('%' + q + '%'))
+    users = users.all()
+    return render_template('admin_users.html', users=users, q=q, user=current_user())
 
 
 @app.route('/admin/block/<int:uid>')
@@ -260,7 +302,10 @@ def staff_dashboard():
         return redirect(url_for('login'))
     user = current_user()
     treks = Trek.query.filter_by(staff_id=user.id).all()
-    return render_template('staff_dashboard.html', treks=treks, user=user)
+    counts = {}
+    for t in treks:
+        counts[t.id] = Booking.query.filter_by(trek_id=t.id, status='Booked').count()
+    return render_template('staff_dashboard.html', treks=treks, counts=counts, user=user)
 
 
 @app.route('/staff/trek/<int:tid>', methods=['GET', 'POST'])
@@ -301,6 +346,23 @@ def user_dashboard():
     return render_template('user_dashboard.html', bookings=bookings, user=user)
 
 
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    user = current_user()
+    if not user:
+        return redirect(url_for('login'))
+    if request.method == 'POST':
+        user.name = request.form['name']
+        user.email = request.form['email']
+        user.phone = request.form['phone']
+        if request.form['password']:
+            user.password = generate_password_hash(request.form['password'])
+        db.session.commit()
+        flash('Profile updated')
+        return redirect(url_for('profile'))
+    return render_template('profile.html', user=user)
+
+
 @app.route('/trek/<int:tid>')
 def trek_details(tid):
     trek = Trek.query.get_or_404(tid)
@@ -317,7 +379,7 @@ def book_trek(tid):
         return redirect(url_for('home'))
     trek = Trek.query.get_or_404(tid)
     members = int(request.form['members'])
-    if trek.status != 'Upcoming':
+    if trek.status != 'Open':
         flash('Booking is closed for this trek')
         return redirect(url_for('trek_details', tid=tid))
     old = Booking.query.filter_by(user_id=user.id, trek_id=trek.id, status='Booked').first()

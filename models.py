@@ -26,10 +26,11 @@ class Trek(db.Model):
     duration = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Integer, nullable=False)
     start_date = db.Column(db.String(20))
+    end_date = db.Column(db.String(20))
     total_slots = db.Column(db.Integer, nullable=False)
     available_slots = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(500))
-    status = db.Column(db.String(20), default='Upcoming')
+    status = db.Column(db.String(20), default='Pending')
     staff_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     bookings = db.relationship('Booking', backref='trek')
 

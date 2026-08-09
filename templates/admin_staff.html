@@ -19,6 +19,14 @@
     {% endfor %}
 </table>
 <h3 class="mt-4">Approved Staff</h3>
+<form method="get" class="row g-2 mb-3">
+    <div class="col-md-5">
+        <input type="text" name="q" class="form-control" placeholder="Search by name or ID" value="{{ q }}">
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-dark">Search</button>
+    </div>
+</form>
 <table class="table table-bordered">
     <tr><th>Name</th><th>Username</th><th>Email</th><th>Treks</th><th>Status</th><th>Action</th></tr>
     {% for s in approved %}
