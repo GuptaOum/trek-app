@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>Admin Dashboard</h3>
+<div class="d-flex align-items-center mb-3">
+    {% if user.photo %}
+    <img src="{{ url_for('static', filename='uploads/' + user.photo) }}" class="avatar-large" style="width:56px; height:56px;">
+    {% else %}
+    <span class="avatar-large avatar-initials" style="width:56px; height:56px; font-size:22px;">{{ user.name[0]|upper }}</span>
+    {% endif %}
+    <div class="ms-3">
+        <h4 class="mb-0">Welcome back, {{ user.name }}</h4>
+        <small class="text-muted">You are signed in as the administrator</small>
+    </div>
+</div>
+
 <div class="row mb-4">
     <div class="col-md-3">
         <div class="card text-center p-3">Total Treks<h4>{{ total_treks }}</h4></div>

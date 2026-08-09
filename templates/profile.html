@@ -3,7 +3,22 @@
 <div class="row justify-content-center">
     <div class="col-md-6">
         <h3>My Profile</h3>
-        <form method="post">
+        <div class="text-center mb-4">
+            {% if user.photo %}
+            <img src="{{ url_for('static', filename='uploads/' + user.photo) }}" class="avatar-large">
+            {% else %}
+            <span class="avatar-large avatar-initials">{{ user.name[0]|upper }}</span>
+            {% endif %}
+            <div class="mt-2">
+                <span class="badge bg-dark">{{ user.role|capitalize }}</span>
+            </div>
+        </div>
+        <form method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label class="form-label">Profile Photo</label>
+                <input type="file" name="photo" class="form-control" accept="image/*">
+                <small class="text-muted">png, jpg, jpeg or gif, up to 2 MB</small>
+            </div>
             <div class="mb-3">
                 <label class="form-label">Username</label>
                 <input type="text" class="form-control" value="{{ user.username }}" disabled>

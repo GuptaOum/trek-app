@@ -12,6 +12,7 @@ class User(db.Model):
     phone = db.Column(db.String(15))
     role = db.Column(db.String(10), nullable=False)
     experience = db.Column(db.String(200))
+    photo = db.Column(db.String(100))
     approved = db.Column(db.Boolean, default=True)
     blocked = db.Column(db.Boolean, default=False)
     treks = db.relationship('Trek', backref='staff')

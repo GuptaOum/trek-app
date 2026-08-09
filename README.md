@@ -38,6 +38,8 @@ A trek moves through `Pending`, `Approved`, `Open`, `Closed` and `Completed`. Ne
 
 **Blacklisting.** A blocked user or guide cannot log in, and a blocked user cannot book.
 
+**Profile and photo.** Every role can edit their own details and upload a profile picture, shown as a round avatar in the navbar. Uploads are limited to png, jpg, jpeg and gif under 2 MB and are saved under the user id, and anyone without a photo gets a circle with their initial.
+
 **Server side search.** Trek name and location are searched with a LIKE query and filtered by difficulty, all in Flask with no JavaScript.
 
 ---
@@ -183,7 +185,7 @@ There is a single `User` table for all three roles because all of them log in th
 | Endpoint | Method | Description |
 |---|---|---|
 | `/dashboard` | GET | Booked treks with trek status, plus the treks open for booking |
-| `/profile` | GET, POST | Edit name, email, phone and password |
+| `/profile` | GET, POST | Edit name, email, phone, password and profile photo |
 | `/book/<id>` | POST | Book slots |
 | `/cancel/<id>` | GET | Cancel and return the slots |
 

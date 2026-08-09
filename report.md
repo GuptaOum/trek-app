@@ -1,6 +1,6 @@
 # Trekking Management Application
 
-**Name:** Om Gupta
+**Name:** Oum Gupta
 **Roll Number:** 24f3003029
 **Email:** 24f3003029@ds.study.iitm.ac.in
 
@@ -136,7 +136,7 @@ The `role` column decides whether a User row is an admin, a staff or a trekker. 
 | Endpoint | Method | Description |
 |---|---|---|
 | `/dashboard` | GET | Booked treks with trek status, and the treks open for booking |
-| `/profile` | GET, POST | Edit own name, email, phone and password |
+| `/profile` | GET, POST | Edit own name, email, phone, password and profile photo |
 | `/book/<tid>` | POST | Book slots on a trek |
 | `/cancel/<bid>` | GET | Cancel a booking and return the slots |
 
@@ -154,6 +154,8 @@ The `role` column decides whether a User row is an admin, a staff or a trekker. 
 
 **Booking history.** Cancelling does not delete the row, it only changes the status to Cancelled and adds the seats back, so the full history stays visible. When a staff marks a trek as Completed all its active bookings also become Completed.
 
+**Profile and photo.** Every role can edit their own details and upload a profile picture, which is shown as a round avatar in the navigation bar. Uploads are restricted to png, jpg, jpeg and gif under 2 MB, saved against the user id, and a user without a photo gets a circle with their initial.
+
 **Search and filter.** The home page searches the trek name and location with a LIKE query and filters by difficulty, both done in Flask without any JavaScript.
 
 **Trek status flow.** A trek moves through Pending, Approved, Open, Closed and Completed. It is created as Pending and stays hidden from trekkers until the admin approves it, only an Open trek can be booked, and the assigned guide moves it to Closed or Completed.
@@ -168,4 +170,12 @@ The database file is created automatically at `instance/trek.db` on the first ru
 
 ## AI Declaration
 
-<state here which parts were written with AI help, as required by the problem statement>
+I have used AI/LLM assistance for this project and I am declaring the extent of that use below.
+
+**Tool used:** Claude, an AI coding assistant.
+
+**What was AI assisted:** the Flask route code in `app.py`, the database models in `models.py`, the Jinja2 templates, the stylesheet, the sample data used for the demonstration, and the first drafts of this report and the project README.
+
+**What I did myself:** reading the problem statement and deciding the requirements, checking the application against every requirement in the problem statement, identifying the features that were missing or did not match the specification and getting them corrected, testing the screens for each role, and the final review of the submitted code.
+
+**Understanding of the code:** I have gone through the complete codebase and I am able to explain the routing, the role checks in every protected route, the slot handling that prevents overbooking, and the relationships between the User, Trek and Booking tables. I am able to modify any part of the application during the viva.

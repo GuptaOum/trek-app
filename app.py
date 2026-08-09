@@ -1,5 +1,7 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from datetime import date
 from models import db, User, Trek, Booking
 
@@ -7,7 +9,25 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'trekking123'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///trek.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'uploads')
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
+ALLOWED = ['png', 'jpg', 'jpeg', 'gif']
 db.init_app(app)
+
+
+def save_photo(f, user):
+    if not f or f.filename == '':
+        return None
+    name = secure_filename(f.filename)
+    if '.' not in name:
+        return None
+    ext = name.rsplit('.', 1)[1].lower()
+    if ext not in ALLOWED:
+        return None
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    filename = 'user_' + str(user.id) + '.' + ext
+    f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    return filename
 
 
 def current_user():
@@ -377,6 +397,12 @@ def profile():
         user.phone = request.form['phone']
         if request.form['password']:
             user.password = generate_password_hash(request.form['password'])
+        photo = save_photo(request.files.get('photo'), user)
+        if photo:
+            user.photo = photo
+        elif request.files.get('photo') and request.files['photo'].filename != '':
+            flash('Only png, jpg, jpeg or gif images are allowed')
+            return redirect(url_for('profile'))
         db.session.commit()
         flash('Profile updated')
         return redirect(url_for('profile'))
@@ -435,6 +461,12 @@ def cancel_booking(bid):
     db.session.commit()
     flash('Booking cancelled')
     return redirect(url_for('user_dashboard'))
+
+
+@app.errorhandler(413)
+def too_large(e):
+    flash('The image is too big, please use one under 2 MB')
+    return redirect(url_for('profile'))
 
 
 def setup():

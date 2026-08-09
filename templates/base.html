@@ -10,23 +10,31 @@
     <div class="container">
         <a class="navbar-brand" href="{{ url_for('home') }}">Trek Manager</a>
         <div class="navbar-nav ms-auto">
-            <a class="nav-link" href="{{ url_for('home') }}">Treks</a>
+            <a class="nav-link {% if request.endpoint in ['home', 'trek_details'] %}active-link{% endif %}" href="{{ url_for('home') }}">Treks</a>
             {% if user %}
                 {% if user.role == 'admin' %}
-                    <a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-                    <a class="nav-link" href="{{ url_for('manage_staff') }}">Staff</a>
-                    <a class="nav-link" href="{{ url_for('manage_users') }}">Users</a>
+                    <a class="nav-link {% if request.endpoint in ['admin_dashboard', 'add_trek', 'edit_trek', 'assign_staff', 'all_bookings'] %}active-link{% endif %}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                    <a class="nav-link {% if request.endpoint == 'manage_staff' %}active-link{% endif %}" href="{{ url_for('manage_staff') }}">Staff</a>
+                    <a class="nav-link {% if request.endpoint == 'manage_users' %}active-link{% endif %}" href="{{ url_for('manage_users') }}">Users</a>
                 {% elif user.role == 'staff' %}
-                    <a class="nav-link" href="{{ url_for('staff_dashboard') }}">My Treks</a>
+                    <a class="nav-link {% if request.endpoint in ['staff_dashboard', 'staff_trek'] %}active-link{% endif %}" href="{{ url_for('staff_dashboard') }}">My Treks</a>
                 {% else %}
-                    <a class="nav-link" href="{{ url_for('user_dashboard') }}">My Bookings</a>
+                    <a class="nav-link {% if request.endpoint == 'user_dashboard' %}active-link{% endif %}" href="{{ url_for('user_dashboard') }}">My Bookings</a>
                 {% endif %}
-                <a class="nav-link text-warning" href="{{ url_for('profile') }}">{{ user.name }}</a>
+                <a class="nav-link d-flex align-items-center {% if request.endpoint == 'profile' %}active-link{% endif %}" href="{{ url_for('profile') }}">
+                    {% if user.photo %}
+                    <img src="{{ url_for('static', filename='uploads/' + user.photo) }}" class="avatar me-2">
+                    {% else %}
+                    <span class="avatar avatar-initials me-2">{{ user.name[0]|upper }}</span>
+                    {% endif %}
+                    {{ user.name }}
+                    <span class="badge bg-secondary ms-2">{{ user.role|capitalize }}</span>
+                </a>
                 <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
             {% else %}
-                <a class="nav-link" href="{{ url_for('login') }}">Login</a>
-                <a class="nav-link" href="{{ url_for('register') }}">Register</a>
-                <a class="nav-link" href="{{ url_for('staff_register') }}">Join as Staff</a>
+                <a class="nav-link {% if request.endpoint == 'login' %}active-link{% endif %}" href="{{ url_for('login') }}">Login</a>
+                <a class="nav-link {% if request.endpoint == 'register' %}active-link{% endif %}" href="{{ url_for('register') }}">Register</a>
+                <a class="nav-link {% if request.endpoint == 'staff_register' %}active-link{% endif %}" href="{{ url_for('staff_register') }}">Join as Staff</a>
             {% endif %}
         </div>
     </div>

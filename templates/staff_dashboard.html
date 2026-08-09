@@ -1,5 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="d-flex align-items-center mb-3">
+    {% if user.photo %}
+    <img src="{{ url_for('static', filename='uploads/' + user.photo) }}" class="avatar-large" style="width:56px; height:56px;">
+    {% else %}
+    <span class="avatar-large avatar-initials" style="width:56px; height:56px; font-size:22px;">{{ user.name[0]|upper }}</span>
+    {% endif %}
+    <div class="ms-3">
+        <h4 class="mb-0">Welcome back, {{ user.name }}</h4>
+        <small class="text-muted">Treks assigned to you by the admin</small>
+    </div>
+</div>
 <h3>My Assigned Treks</h3>
 <table class="table table-bordered">
     <tr><th>ID</th><th>Name</th><th>Location</th><th>Start Date</th><th>End Date</th><th>Slots</th><th>Registered Users</th><th>Status</th><th>Action</th></tr>
