@@ -1,37 +1,213 @@
 # Trekking Management Application
 
-Web application to manage treks, trek staff and trekker bookings.
+A web based trekking management system where an admin manages treks, trek guides manage the treks assigned to them, and trekkers search and book available slots. Built with Flask, Jinja2, Bootstrap and SQLite.
 
-## Technologies
-- Flask
-- Jinja2, HTML, CSS, Bootstrap
-- SQLite with Flask-SQLAlchemy
+![Python](https://img.shields.io/badge/Python-3.14-blue)
+![Flask](https://img.shields.io/badge/Flask-3.0.3-black)
+![SQLite](https://img.shields.io/badge/SQLite-database-003B57)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3)
+![No JavaScript](https://img.shields.io/badge/JavaScript-none-lightgrey)
 
-## How to run
+---
 
-```
+## What it does
+
+The application solves one main problem: keeping the slot count of a trek correct so that it never gets more bookings than seats available, while making sure each of the three roles can only do the work that belongs to that role.
+
+| Role | Can do |
+|---|---|
+| **Admin** | Create, edit and delete treks. Approve or reject guide requests. Assign guides to treks. Block users and guides. |
+| **Trek Staff** | Register on their own, wait for admin approval, then manage only the treks assigned to them, update slots and status, and view participants. |
+| **Trekker** | Register, search and filter treks, book slots, cancel a booking, and see their full booking history. |
+
+---
+
+## Features
+
+**Overbooking is not possible.** A booking is rejected if the requested members exceed the available slots, and the slot count is reduced in the same transaction as the booking row is created.
+
+**Slots can never go below what is booked.** When the admin or a guide changes the total slots, the number of already booked seats is calculated first and any smaller value is refused.
+
+**Guides need approval.** A guide account is created inactive and cannot log in until the admin approves it. Only approved and unblocked guides appear in the assignment dropdown.
+
+**Booking history is preserved.** Cancelling never deletes a row, it changes the status to `Cancelled` and returns the seats. When a guide marks a trek `Completed`, all its active bookings become `Completed` too.
+
+**Blacklisting.** A blocked user or guide cannot log in, and a blocked user cannot book.
+
+**Server side search.** Trek name and location are searched with a LIKE query and filtered by difficulty, all in Flask with no JavaScript.
+
+---
+
+## Tech stack
+
+| Layer | Used |
+|---|---|
+| Web framework | Flask 3.0.3 |
+| Templating | Jinja2 |
+| ORM | SQLAlchemy via Flask-SQLAlchemy |
+| Database | SQLite, created programmatically |
+| Frontend | HTML, Bootstrap 5, small custom CSS |
+| Auth | Flask session with Werkzeug password hashing |
+
+No JavaScript is used anywhere in the application.
+
+---
+
+## Getting started
+
+```bash
+git clone https://github.com/GuptaOum/trek-app.git
+cd trek-app
 python -m venv venv
 venv\Scripts\activate
 pip install -r requirements.txt
 python app.py
 ```
 
-Open http://127.0.0.1:5000 in the browser. The database file `trek.db` is created automatically on the first run.
+Open <http://127.0.0.1:5000> in the browser. The database is created automatically at `instance/trek.db` on the first run, along with the admin account.
 
-## Admin login
-Username: admin
-Password: admin123
+**Default admin:** `admin` / `admin123`
 
-## Roles
+---
 
-**Admin** creates treks, approves or rejects staff requests, assigns staff to treks, and blocks users or staff.
+## Database design
 
-**Trek Staff** registers from the site and can log in only after admin approval. Staff can see the treks assigned to them, change the number of slots and update the trek status.
+```mermaid
+erDiagram
+    USER ||--o{ BOOKING : makes
+    USER ||--o{ TREK : "is assigned as staff"
+    TREK ||--o{ BOOKING : has
 
-**Users** register, search and filter treks by name, location and difficulty, book available treks, cancel a booking and see their booking history.
+    USER {
+        int id PK
+        string username UK
+        string password
+        string name
+        string email
+        string phone
+        string role
+        string experience
+        bool approved
+        bool blocked
+    }
+    TREK {
+        int id PK
+        string name
+        string location
+        string difficulty
+        int duration
+        int price
+        string start_date
+        int total_slots
+        int available_slots
+        string description
+        string status
+        int staff_id FK
+    }
+    BOOKING {
+        int id PK
+        int user_id FK
+        int trek_id FK
+        int members
+        string status
+        string booked_on
+    }
+```
 
-## Files
-- `app.py` - routes and application logic
-- `models.py` - database tables
-- `templates/` - Jinja2 pages
-- `static/style.css` - extra styling
+There is a single `User` table for all three roles because all of them log in the same way and only their permissions differ. The `role` column decides what a row is, `approved` stays false for a guide until the admin approves them, and `blocked` is used for blacklisting.
+
+---
+
+## Routes
+
+### Public and authentication
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/` | GET | Trek listing, supports `?q=` and `?difficulty=` |
+| `/login` | GET, POST | Login, redirects by role |
+| `/register` | GET, POST | Trekker registration |
+| `/staff/register` | GET, POST | Guide registration, needs approval |
+| `/logout` | GET | Clears the session |
+| `/trek/<id>` | GET | Trek details and booking form |
+
+### Admin
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/admin` | GET | Dashboard with summary counts |
+| `/admin/trek/add` | GET, POST | Create a trek |
+| `/admin/trek/edit/<id>` | GET, POST | Edit a trek |
+| `/admin/trek/delete/<id>` | GET | Delete a trek |
+| `/admin/trek/assign/<id>` | GET, POST | Assign a guide |
+| `/admin/staff` | GET | Pending and approved guides |
+| `/admin/staff/approve/<id>` | GET | Approve a guide |
+| `/admin/staff/reject/<id>` | GET | Reject a guide |
+| `/admin/users` | GET | All registered trekkers |
+| `/admin/block/<id>` | GET | Block or unblock |
+
+### Trek staff
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/staff` | GET | Treks assigned to the logged in guide |
+| `/staff/trek/<id>` | GET, POST | Update slots and status, view participants |
+
+### Trekker
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/dashboard` | GET | Booking history |
+| `/book/<id>` | POST | Book slots |
+| `/cancel/<id>` | GET | Cancel and return the slots |
+
+---
+
+## Project structure
+
+```
+trek_app/
+├── app.py              routes and application logic
+├── models.py           User, Trek and Booking tables
+├── requirements.txt
+├── report.pdf          project report with ER diagram
+├── static/
+│   └── style.css
+└── templates/
+    ├── base.html       navbar, flash messages, layout
+    ├── index.html      trek listing with search
+    ├── trek_details.html
+    ├── login.html
+    ├── register.html
+    ├── staff_register.html
+    ├── admin_dashboard.html
+    ├── admin_staff.html
+    ├── admin_users.html
+    ├── trek_form.html
+    ├── assign.html
+    ├── staff_dashboard.html
+    ├── staff_trek.html
+    └── user_dashboard.html
+```
+
+---
+
+## Sample data
+
+The repository ships with an empty database. Trek names and locations used while testing are real Indian treks, but all prices, dates, slot counts, guides, users and bookings are made up sample data entered through the admin screens. Nothing is fetched from any website or API.
+
+---
+
+## Known limitations
+
+Routes like `/cancel/<id>` and `/admin/block/<id>` change state over GET so that they can stay plain links, since JavaScript is not allowed in this project. In a normal application these would be POST requests.
+
+Two people booking the last seat at the exact same moment could both pass the availability check before either commits. A conditional update or a row lock would be the proper fix.
+
+There is no CSRF protection, which would usually be handled by Flask-WTF.
+
+---
+
+## Notes
+
+This is an academic project built for a course assignment. The development server used here is the Flask built in server, which is not meant for production use.
