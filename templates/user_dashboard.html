@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}My Bookings | Trek Manager{% endblock %}
 {% block content %}
 <div class="d-flex align-items-center mb-3">
     {% if user.photo %}
@@ -12,8 +13,11 @@
     </div>
 </div>
 <h3>Booked Treks</h3>
-<table class="table table-bordered">
-    <tr><th>Booking ID</th><th>Trek</th><th>Location</th><th>Start Date</th><th>End Date</th><th>Members</th><th>Booked On</th><th>Trek Status</th><th>Booking Status</th><th>Action</th></tr>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>Booking ID</th><th>Trek</th><th>Location</th><th>Start Date</th><th>End Date</th><th>Members</th><th>Booked On</th><th>Trek Status</th><th>Booking Status</th><th>Action</th></tr></thead>
+<tbody>
     {% for b in bookings %}
     <tr>
         <td>{{ b.id }}</td>
@@ -34,11 +38,16 @@
     {% else %}
     <tr><td colspan="10">You have not booked any trek</td></tr>
     {% endfor %}
+</tbody>
 </table>
+</div>
 
 <h3 class="mt-4">Available Treks</h3>
-<table class="table table-bordered">
-    <tr><th>ID</th><th>Trek</th><th>Location</th><th>Difficulty</th><th>Start Date</th><th>Slots Left</th><th>Status</th><th>Action</th></tr>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>ID</th><th>Trek</th><th>Location</th><th>Difficulty</th><th>Start Date</th><th>Slots Left</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
     {% for t in available %}
     <tr>
         <td>{{ t.id }}</td>
@@ -53,5 +62,7 @@
     {% else %}
     <tr><td colspan="8">No treks are open for booking right now</td></tr>
     {% endfor %}
+</tbody>
 </table>
+</div>
 {% endblock %}

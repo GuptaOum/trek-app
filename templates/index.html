@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}Treks | Trek Manager{% endblock %}
 {% block content %}
 <h3>Available Treks</h3>
 <form method="get" class="row g-2 mb-4">
@@ -17,6 +18,13 @@
         <button class="btn btn-dark w-100">Search</button>
     </div>
 </form>
+{% if q or difficulty %}
+<p class="text-muted">
+    {{ treks|length }} trek{% if treks|length != 1 %}s{% endif %} found
+    {% if q %}for "{{ q }}"{% endif %}{% if difficulty %} in {{ difficulty }}{% endif %}
+    <a href="{{ url_for('home') }}" class="ms-2">Clear search</a>
+</p>
+{% endif %}
 <div class="row">
     {% for t in treks %}
     <div class="col-md-4 mb-3">
@@ -34,7 +42,11 @@
         </div>
     </div>
     {% else %}
-    <p>No treks found.</p>
+    <div class="col-12">
+        <div class="alert alert-secondary">
+            No treks match what you searched for. <a href="{{ url_for('home') }}">See all treks</a>
+        </div>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}

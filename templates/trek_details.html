@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}{{ trek.name }} | Trek Manager{% endblock %}
 {% block content %}
 <div class="row">
     <div class="col-md-8">
@@ -21,8 +22,8 @@
             {% if trek.status == 'Open' and trek.available_slots > 0 %}
             <form method="post" action="{{ url_for('book_trek', tid=trek.id) }}">
                 <div class="mb-3">
-                    <label class="form-label">Number of Members</label>
-                    <input type="number" name="members" class="form-control" value="1" min="1" max="{{ trek.available_slots }}" required>
+                    <label class="form-label" for="members">Number of Members</label>
+                <input id="members" type="number" name="members" class="form-control" value="1" min="1" max="{{ trek.available_slots }}" required>
                 </div>
                 <button class="btn btn-success">Book Now</button>
             </form>

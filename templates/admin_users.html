@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}Registered Users | Trek Manager{% endblock %}
 {% block content %}
 <h3>Registered Users</h3>
 <form method="get" class="row g-2 mb-3">
@@ -9,8 +10,11 @@
         <button class="btn btn-dark">Search</button>
     </div>
 </form>
-<table class="table table-bordered">
-    <tr><th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Bookings</th><th>Status</th><th>Action</th></tr>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Bookings</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
     {% for u in users %}
     <tr>
         <td>{{ u.id }}</td>
@@ -26,5 +30,7 @@
     {% else %}
     <tr><td colspan="8">No users registered</td></tr>
     {% endfor %}
+</tbody>
 </table>
+</div>
 {% endblock %}

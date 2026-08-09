@@ -1,8 +1,12 @@
 {% extends 'base.html' %}
+{% block title %}Manage Staff | Trek Manager{% endblock %}
 {% block content %}
 <h3>Pending Staff Requests</h3>
-<table class="table table-bordered">
-    <tr><th>Name</th><th>Username</th><th>Email</th><th>Experience</th><th>Action</th></tr>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>Name</th><th>Username</th><th>Email</th><th>Experience</th><th>Action</th></tr></thead>
+<tbody>
     {% for s in pending %}
     <tr>
         <td>{{ s.name }}</td>
@@ -17,7 +21,9 @@
     {% else %}
     <tr><td colspan="5">No pending requests</td></tr>
     {% endfor %}
+</tbody>
 </table>
+</div>
 <h3 class="mt-4">Approved Staff</h3>
 <form method="get" class="row g-2 mb-3">
     <div class="col-md-5">
@@ -27,8 +33,11 @@
         <button class="btn btn-dark">Search</button>
     </div>
 </form>
-<table class="table table-bordered">
-    <tr><th>Name</th><th>Username</th><th>Email</th><th>Treks</th><th>Status</th><th>Action</th></tr>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>Name</th><th>Username</th><th>Email</th><th>Treks</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
     {% for s in approved %}
     <tr>
         <td>{{ s.name }}</td>
@@ -42,5 +51,7 @@
     {% else %}
     <tr><td colspan="6">No staff yet</td></tr>
     {% endfor %}
+</tbody>
 </table>
+</div>
 {% endblock %}

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}My Treks | Trek Manager{% endblock %}
 {% block content %}
 <div class="d-flex align-items-center mb-3">
     {% if user.photo %}
@@ -12,8 +13,11 @@
     </div>
 </div>
 <h3>My Assigned Treks</h3>
-<table class="table table-bordered">
-    <tr><th>ID</th><th>Name</th><th>Location</th><th>Start Date</th><th>End Date</th><th>Slots</th><th>Registered Users</th><th>Status</th><th>Action</th></tr>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>ID</th><th>Name</th><th>Location</th><th>Start Date</th><th>End Date</th><th>Slots</th><th>Registered Users</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
     {% for t in treks %}
     <tr>
         <td>{{ t.id }}</td>
@@ -29,5 +33,7 @@
     {% else %}
     <tr><td colspan="9">No trek assigned to you yet</td></tr>
     {% endfor %}
+</tbody>
 </table>
+</div>
 {% endblock %}

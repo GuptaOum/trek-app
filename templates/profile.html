@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% block title %}My Profile | Trek Manager{% endblock %}
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-6">
@@ -15,8 +16,8 @@
         </div>
         <form method="post" enctype="multipart/form-data">
             <div class="mb-3">
-                <label class="form-label">Profile Photo</label>
-                <input type="file" name="photo" class="form-control" accept="image/*">
+                <label class="form-label" for="photo">Profile Photo</label>
+                <input id="photo" type="file" name="photo" class="form-control" accept="image/*">
                 <small class="text-muted">png, jpg, jpeg or gif, up to 2 MB</small>
             </div>
             <div class="mb-3">
@@ -24,20 +25,20 @@
                 <input type="text" class="form-control" value="{{ user.username }}" disabled>
             </div>
             <div class="mb-3">
-                <label class="form-label">Full Name</label>
-                <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+                <label class="form-label" for="name">Full Name</label>
+                <input id="name" type="text" name="name" class="form-control" value="{{ user.name }}" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" value="{{ user.email }}">
+                <label class="form-label" for="email">Email</label>
+                <input id="email" type="email" name="email" class="form-control" value="{{ user.email }}">
             </div>
             <div class="mb-3">
-                <label class="form-label">Phone</label>
-                <input type="text" name="phone" class="form-control" value="{{ user.phone }}">
+                <label class="form-label" for="phone">Phone</label>
+                <input id="phone" type="text" name="phone" class="form-control" value="{{ user.phone }}">
             </div>
             <div class="mb-3">
-                <label class="form-label">New Password</label>
-                <input type="password" name="password" class="form-control" placeholder="leave blank to keep the old one">
+                <label class="form-label" for="password">New Password</label>
+                <input id="password" type="password" name="password" class="form-control" placeholder="leave blank to keep the old one">
             </div>
             <button class="btn btn-dark">Save Changes</button>
         </form>

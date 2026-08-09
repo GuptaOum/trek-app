@@ -1,17 +1,24 @@
 {% extends 'base.html' %}
+{% block title %}{{ trek.name }} | Trek Manager{% endblock %}
 {% block content %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('staff_dashboard') }}">My Treks</a></li>
+        <li class="breadcrumb-item active">Manage trek</li>
+    </ol>
+</nav>
 <h3>{{ trek.name }}</h3>
 <p>{{ trek.location }} | {{ trek.difficulty }} | {{ trek.duration }} days</p>
 <div class="row">
     <div class="col-md-5">
         <form method="post">
             <div class="mb-3">
-                <label class="form-label">Total Slots</label>
-                <input type="number" name="total_slots" class="form-control" value="{{ trek.total_slots }}" required>
+                <label class="form-label" for="total_slots">Total Slots</label>
+                <input id="total_slots" type="number" name="total_slots" class="form-control" value="{{ trek.total_slots }}" required>
             </div>
             <div class="mb-3">
-                <label class="form-label">Status</label>
-                <select name="status" class="form-select">
+                <label class="form-label" for="status">Status</label>
+                <select id="status" name="status" class="form-select">
                     <option value="Open" {% if trek.status == 'Open' %}selected{% endif %}>Open for booking</option>
                     <option value="Closed" {% if trek.status == 'Closed' %}selected{% endif %}>Closed, trek started</option>
                     <option value="Completed" {% if trek.status == 'Completed' %}selected{% endif %}>Completed</option>
@@ -22,8 +29,11 @@
     </div>
     <div class="col-md-7">
         <h5>Participants</h5>
-        <table class="table table-bordered">
-            <tr><th>Name</th><th>Phone</th><th>Members</th><th>Status</th><th>Action</th></tr>
+        <div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+            <tr><th>Name</th><th>Phone</th><th>Members</th><th>Status</th><th>Action</th></tr></thead>
+<tbody>
             {% for b in bookings %}
             <tr>
                 <td>{{ b.user.name }}</td>
@@ -39,7 +49,9 @@
             {% else %}
             <tr><td colspan="5">No bookings yet</td></tr>
             {% endfor %}
-        </table>
+        </tbody>
+</table>
+</div>
     </div>
 </div>
 {% endblock %}

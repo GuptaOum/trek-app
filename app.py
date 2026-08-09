@@ -57,13 +57,13 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
         if not user or not check_password_hash(user.password, password):
-            flash('Wrong username or password')
+            flash('Wrong username or password', 'danger')
             return redirect(url_for('login'))
         if user.blocked:
-            flash('Your account has been blocked by admin')
+            flash('Your account has been blocked by admin', 'danger')
             return redirect(url_for('login'))
         if user.role == 'staff' and not user.approved:
-            flash('Your account is waiting for admin approval')
+            flash('Your account is waiting for admin approval', 'warning')
             return redirect(url_for('login'))
         session['user_id'] = user.id
         session['role'] = user.role
@@ -80,7 +80,7 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         if User.query.filter_by(username=username).first():
-            flash('Username already taken')
+            flash('Username already taken', 'danger')
             return redirect(url_for('register'))
         u = User(username=username,
                  password=generate_password_hash(request.form['password']),
@@ -91,7 +91,7 @@ def register():
                  approved=True)
         db.session.add(u)
         db.session.commit()
-        flash('Registration done, please login')
+        flash('Registration done, please login', 'success')
         return redirect(url_for('login'))
     return render_template('register.html')
 
@@ -101,7 +101,7 @@ def staff_register():
     if request.method == 'POST':
         username = request.form['username']
         if User.query.filter_by(username=username).first():
-            flash('Username already taken')
+            flash('Username already taken', 'danger')
             return redirect(url_for('staff_register'))
         u = User(username=username,
                  password=generate_password_hash(request.form['password']),
@@ -113,7 +113,7 @@ def staff_register():
                  approved=False)
         db.session.add(u)
         db.session.commit()
-        flash('Registration sent to admin for approval')
+        flash('Registration sent to admin for approval', 'success')
         return redirect(url_for('login'))
     return render_template('staff_register.html')
 
@@ -150,16 +150,14 @@ def admin_dashboard():
         staff_list = User.query.filter_by(role='staff', approved=True, blocked=False).all()
     stats = []
     if show == 'staff':
-        for s in User.query.filter_by(role='staff').all():
-            treks_of_staff = Trek.query.filter_by(staff_id=s.id).all()
-            trekkers = 0
-            for t in treks_of_staff:
-                for b in t.bookings:
-                    if b.status == 'Booked':
-                        trekkers = trekkers + b.members
-            stats.append({'staff': s, 'treks': len(treks_of_staff), 'trekkers': trekkers,
-                          'open': len([t for t in treks_of_staff if t.status == 'Open']),
-                          'completed': len([t for t in treks_of_staff if t.status == 'Completed'])})
+        for s in User.query.filter_by(role='staff').order_by(User.name).all():
+            assigned = Trek.query.filter_by(staff_id=s.id).order_by(Trek.id).all()
+            capacity = 0
+            filled = 0
+            for t in assigned:
+                capacity = capacity + t.total_slots
+                filled = filled + (t.total_slots - t.available_slots)
+            stats.append({'staff': s, 'treks': assigned, 'capacity': capacity, 'filled': filled})
     return render_template('admin_dashboard.html', treks=treks, pending=pending,
                            total_users=total_users, total_staff=total_staff,
                            total_treks=total_treks, total_bookings=total_bookings,
@@ -201,7 +199,7 @@ def add_trek():
                  status='Pending')
         db.session.add(t)
         db.session.commit()
-        flash('Trek added')
+        flash('Trek added', 'success')
         return redirect(url_for('admin_dashboard'))
     return render_template('trek_form.html', trek=None, user=current_user())
 
@@ -215,7 +213,7 @@ def edit_trek(tid):
         booked = trek.total_slots - trek.available_slots
         new_total = int(request.form['total_slots'])
         if new_total < booked:
-            flash('Total slots cannot be less than already booked slots')
+            flash('Total slots cannot be less than already booked slots', 'danger')
             return redirect(url_for('edit_trek', tid=tid))
         trek.name = request.form['name']
         trek.location = request.form['location']
@@ -229,21 +227,26 @@ def edit_trek(tid):
         trek.description = request.form['description']
         trek.status = request.form['status']
         db.session.commit()
-        flash('Trek updated')
+        flash('Trek updated', 'success')
         return redirect(url_for('admin_dashboard'))
     return render_template('trek_form.html', trek=trek, user=current_user())
 
 
-@app.route('/admin/trek/delete/<int:tid>')
+@app.route('/admin/trek/delete/<int:tid>', methods=['GET', 'POST'])
 def delete_trek(tid):
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
     trek = Trek.query.get_or_404(tid)
-    Booking.query.filter_by(trek_id=trek.id).delete()
-    db.session.delete(trek)
-    db.session.commit()
-    flash('Trek deleted')
-    return redirect(url_for('admin_dashboard'))
+    if request.method == 'POST':
+        Booking.query.filter_by(trek_id=trek.id).delete()
+        db.session.delete(trek)
+        db.session.commit()
+        flash('Trek deleted', 'success')
+        return redirect(url_for('admin_dashboard'))
+    active = Booking.query.filter_by(trek_id=trek.id, status='Booked').count()
+    total = Booking.query.filter_by(trek_id=trek.id).count()
+    return render_template('confirm_delete.html', trek=trek, active=active,
+                           total=total, user=current_user())
 
 
 @app.route('/admin/trek/assign/<int:tid>', methods=['GET', 'POST'])
@@ -259,11 +262,11 @@ def assign_staff(tid):
         else:
             staff = User.query.get(int(sid))
             if staff is None or staff.role != 'staff' or not staff.approved or staff.blocked:
-                flash('This staff cannot be assigned')
+                flash('This staff cannot be assigned', 'danger')
                 return redirect(url_for('assign_staff', tid=tid))
             trek.staff_id = staff.id
         db.session.commit()
-        flash('Staff assigned')
+        flash('Staff assigned', 'success')
         return redirect(url_for('admin_dashboard'))
     return render_template('assign.html', trek=trek, staff_list=staff_list, user=current_user())
 
@@ -291,7 +294,7 @@ def approve_staff(uid):
     staff = User.query.get_or_404(uid)
     staff.approved = True
     db.session.commit()
-    flash('Staff approved')
+    flash('Staff approved', 'success')
     return redirect(url_for('manage_staff'))
 
 
@@ -302,7 +305,7 @@ def reject_staff(uid):
     staff = User.query.get_or_404(uid)
     db.session.delete(staff)
     db.session.commit()
-    flash('Staff request rejected')
+    flash('Staff request rejected', 'success')
     return redirect(url_for('manage_staff'))
 
 
@@ -327,7 +330,7 @@ def block_user(uid):
         return redirect(url_for('login'))
     person = User.query.get_or_404(uid)
     if person.role == 'admin':
-        flash('Admin cannot be blocked')
+        flash('Admin cannot be blocked', 'danger')
         return redirect(url_for('admin_dashboard'))
     person.blocked = not person.blocked
     db.session.commit()
@@ -355,13 +358,13 @@ def staff_trek(tid):
     user = current_user()
     trek = Trek.query.get_or_404(tid)
     if trek.staff_id != user.id:
-        flash('This trek is not assigned to you')
+        flash('This trek is not assigned to you', 'danger')
         return redirect(url_for('staff_dashboard'))
     if request.method == 'POST':
         booked = trek.total_slots - trek.available_slots
         new_total = int(request.form['total_slots'])
         if new_total < booked:
-            flash('Total slots cannot be less than already booked slots')
+            flash('Total slots cannot be less than already booked slots', 'danger')
             return redirect(url_for('staff_trek', tid=tid))
         trek.total_slots = new_total
         trek.available_slots = new_total - booked
@@ -371,7 +374,7 @@ def staff_trek(tid):
                 if b.status == 'Booked':
                     b.status = 'Completed'
         db.session.commit()
-        flash('Trek updated')
+        flash('Trek updated', 'success')
         return redirect(url_for('staff_dashboard'))
     bookings = Booking.query.filter_by(trek_id=trek.id).all()
     return render_template('staff_trek.html', trek=trek, bookings=bookings, user=user)
@@ -384,15 +387,15 @@ def staff_cancel_booking(bid):
     user = current_user()
     b = Booking.query.get_or_404(bid)
     if b.trek.staff_id != user.id:
-        flash('This booking is not on your trek')
+        flash('This booking is not on your trek', 'danger')
         return redirect(url_for('staff_dashboard'))
     if b.status != 'Booked':
-        flash('This booking cannot be cancelled')
+        flash('This booking cannot be cancelled', 'danger')
         return redirect(url_for('staff_trek', tid=b.trek_id))
     b.status = 'Cancelled'
     b.trek.available_slots = b.trek.available_slots + b.members
     db.session.commit()
-    flash('Booking cancelled and slots returned')
+    flash('Booking cancelled and slots returned', 'success')
     return redirect(url_for('staff_trek', tid=b.trek_id))
 
 
@@ -421,10 +424,10 @@ def profile():
         if photo:
             user.photo = photo
         elif request.files.get('photo') and request.files['photo'].filename != '':
-            flash('Only png, jpg, jpeg or gif images are allowed')
+            flash('Only png, jpg, jpeg or gif images are allowed', 'danger')
             return redirect(url_for('profile'))
         db.session.commit()
-        flash('Profile updated')
+        flash('Profile updated', 'success')
         return redirect(url_for('profile'))
     return render_template('profile.html', user=user)
 
@@ -441,26 +444,26 @@ def book_trek(tid):
         return redirect(url_for('login'))
     user = current_user()
     if user.blocked:
-        flash('You are blocked and cannot book treks')
+        flash('You are blocked and cannot book treks', 'danger')
         return redirect(url_for('home'))
     trek = Trek.query.get_or_404(tid)
     members = int(request.form['members'])
     if trek.status != 'Open':
-        flash('Booking is closed for this trek')
+        flash('Booking is closed for this trek', 'danger')
         return redirect(url_for('trek_details', tid=tid))
     old = Booking.query.filter_by(user_id=user.id, trek_id=trek.id, status='Booked').first()
     if old:
-        flash('You have already booked this trek')
+        flash('You have already booked this trek', 'danger')
         return redirect(url_for('trek_details', tid=tid))
     if members < 1 or members > trek.available_slots:
-        flash('Not enough slots available')
+        flash('Not enough slots available', 'danger')
         return redirect(url_for('trek_details', tid=tid))
     b = Booking(user_id=user.id, trek_id=trek.id, members=members,
                 status='Booked', booked_on=str(date.today()))
     trek.available_slots = trek.available_slots - members
     db.session.add(b)
     db.session.commit()
-    flash('Trek booked')
+    flash('Trek booked', 'success')
     return redirect(url_for('user_dashboard'))
 
 
@@ -471,21 +474,21 @@ def cancel_booking(bid):
     user = current_user()
     b = Booking.query.get_or_404(bid)
     if b.user_id != user.id:
-        flash('Not allowed')
+        flash('Not allowed', 'danger')
         return redirect(url_for('user_dashboard'))
     if b.status != 'Booked':
-        flash('This booking cannot be cancelled')
+        flash('This booking cannot be cancelled', 'danger')
         return redirect(url_for('user_dashboard'))
     b.status = 'Cancelled'
     b.trek.available_slots = b.trek.available_slots + b.members
     db.session.commit()
-    flash('Booking cancelled')
+    flash('Booking cancelled', 'success')
     return redirect(url_for('user_dashboard'))
 
 
 @app.errorhandler(413)
 def too_large(e):
-    flash('The image is too big, please use one under 2 MB')
+    flash('The image is too big, please use one under 2 MB', 'danger')
     return redirect(url_for('profile'))
 
 
