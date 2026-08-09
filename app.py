@@ -337,13 +337,33 @@ def staff_trek(tid):
     return render_template('staff_trek.html', trek=trek, bookings=bookings, user=user)
 
 
+@app.route('/staff/booking/<int:bid>/cancel')
+def staff_cancel_booking(bid):
+    if session.get('role') != 'staff':
+        return redirect(url_for('login'))
+    user = current_user()
+    b = Booking.query.get_or_404(bid)
+    if b.trek.staff_id != user.id:
+        flash('This booking is not on your trek')
+        return redirect(url_for('staff_dashboard'))
+    if b.status != 'Booked':
+        flash('This booking cannot be cancelled')
+        return redirect(url_for('staff_trek', tid=b.trek_id))
+    b.status = 'Cancelled'
+    b.trek.available_slots = b.trek.available_slots + b.members
+    db.session.commit()
+    flash('Booking cancelled and slots returned')
+    return redirect(url_for('staff_trek', tid=b.trek_id))
+
+
 @app.route('/dashboard')
 def user_dashboard():
     if session.get('role') != 'user':
         return redirect(url_for('login'))
     user = current_user()
     bookings = Booking.query.filter_by(user_id=user.id).all()
-    return render_template('user_dashboard.html', bookings=bookings, user=user)
+    available = Trek.query.filter_by(status='Open').all()
+    return render_template('user_dashboard.html', bookings=bookings, available=available, user=user)
 
 
 @app.route('/profile', methods=['GET', 'POST'])

@@ -176,12 +176,13 @@ There is a single `User` table for all three roles because all of them log in th
 |---|---|---|
 | `/staff` | GET | Treks assigned to the logged in guide |
 | `/staff/trek/<id>` | GET, POST | Update slots and status, view participants |
+| `/staff/booking/<id>/cancel` | GET | Remove a participant from an assigned trek |
 
 ### Trekker
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/dashboard` | GET | Booking history |
+| `/dashboard` | GET | Booked treks with trek status, plus the treks open for booking |
 | `/profile` | GET, POST | Edit name, email, phone and password |
 | `/book/<id>` | POST | Book slots |
 | `/cancel/<id>` | GET | Cancel and return the slots |

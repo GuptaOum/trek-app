@@ -12,8 +12,8 @@
             <div class="mb-3">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-select">
-                    <option value="Open" {% if trek.status == 'Open' %}selected{% endif %}>Open</option>
-                    <option value="Closed" {% if trek.status == 'Closed' %}selected{% endif %}>Closed</option>
+                    <option value="Open" {% if trek.status == 'Open' %}selected{% endif %}>Open for booking</option>
+                    <option value="Closed" {% if trek.status == 'Closed' %}selected{% endif %}>Closed, trek started</option>
                     <option value="Completed" {% if trek.status == 'Completed' %}selected{% endif %}>Completed</option>
                 </select>
             </div>
@@ -23,16 +23,21 @@
     <div class="col-md-7">
         <h5>Participants</h5>
         <table class="table table-bordered">
-            <tr><th>Name</th><th>Phone</th><th>Members</th><th>Status</th></tr>
+            <tr><th>Name</th><th>Phone</th><th>Members</th><th>Status</th><th>Action</th></tr>
             {% for b in bookings %}
             <tr>
                 <td>{{ b.user.name }}</td>
                 <td>{{ b.user.phone }}</td>
                 <td>{{ b.members }}</td>
                 <td>{{ b.status }}</td>
+                <td>
+                    {% if b.status == 'Booked' %}
+                    <a href="{{ url_for('staff_cancel_booking', bid=b.id) }}" class="btn btn-sm btn-danger">Remove</a>
+                    {% endif %}
+                </td>
             </tr>
             {% else %}
-            <tr><td colspan="4">No bookings yet</td></tr>
+            <tr><td colspan="5">No bookings yet</td></tr>
             {% endfor %}
         </table>
     </div>

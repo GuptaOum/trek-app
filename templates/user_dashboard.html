@@ -1,16 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<h3>My Bookings</h3>
+<h3>Booked Treks</h3>
 <table class="table table-bordered">
-    <tr><th>Booking ID</th><th>Trek</th><th>Location</th><th>Start Date</th><th>Members</th><th>Booked On</th><th>Status</th><th>Action</th></tr>
+    <tr><th>Booking ID</th><th>Trek</th><th>Location</th><th>Start Date</th><th>End Date</th><th>Members</th><th>Booked On</th><th>Trek Status</th><th>Booking Status</th><th>Action</th></tr>
     {% for b in bookings %}
     <tr>
         <td>{{ b.id }}</td>
         <td>{{ b.trek.name }}</td>
         <td>{{ b.trek.location }}</td>
         <td>{{ b.trek.start_date }}</td>
+        <td>{{ b.trek.end_date }}</td>
         <td>{{ b.members }}</td>
         <td>{{ b.booked_on }}</td>
+        <td>{{ b.trek.status }}</td>
         <td>{{ b.status }}</td>
         <td>
             {% if b.status == 'Booked' %}
@@ -19,7 +21,26 @@
         </td>
     </tr>
     {% else %}
-    <tr><td colspan="8">You have not booked any trek</td></tr>
+    <tr><td colspan="10">You have not booked any trek</td></tr>
+    {% endfor %}
+</table>
+
+<h3 class="mt-4">Available Treks</h3>
+<table class="table table-bordered">
+    <tr><th>ID</th><th>Trek</th><th>Location</th><th>Difficulty</th><th>Start Date</th><th>Slots Left</th><th>Status</th><th>Action</th></tr>
+    {% for t in available %}
+    <tr>
+        <td>{{ t.id }}</td>
+        <td>{{ t.name }}</td>
+        <td>{{ t.location }}</td>
+        <td>{{ t.difficulty }}</td>
+        <td>{{ t.start_date }}</td>
+        <td>{{ t.available_slots }}</td>
+        <td>{{ t.status }}</td>
+        <td><a href="{{ url_for('trek_details', tid=t.id) }}" class="btn btn-sm btn-primary">View</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8">No treks are open for booking right now</td></tr>
     {% endfor %}
 </table>
 {% endblock %}

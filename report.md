@@ -129,12 +129,13 @@ The `role` column decides whether a User row is an admin, a staff or a trekker. 
 |---|---|---|
 | `/staff` | GET | Treks assigned to the logged in staff |
 | `/staff/trek/<tid>` | GET, POST | Update slots and status, view the participant list |
+| `/staff/booking/<bid>/cancel` | GET | Remove a participant from an assigned trek |
 
 ### Trekker
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/dashboard` | GET | Booking history of the logged in user |
+| `/dashboard` | GET | Booked treks with trek status, and the treks open for booking |
 | `/profile` | GET, POST | Edit own name, email, phone and password |
 | `/book/<tid>` | POST | Book slots on a trek |
 | `/cancel/<bid>` | GET | Cancel a booking and return the slots |
