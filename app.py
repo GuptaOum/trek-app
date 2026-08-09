@@ -148,10 +148,22 @@ def admin_dashboard():
     staff_list = []
     if show == 'add':
         staff_list = User.query.filter_by(role='staff', approved=True, blocked=False).all()
+    stats = []
+    if show == 'staff':
+        for s in User.query.filter_by(role='staff').all():
+            treks_of_staff = Trek.query.filter_by(staff_id=s.id).all()
+            trekkers = 0
+            for t in treks_of_staff:
+                for b in t.bookings:
+                    if b.status == 'Booked':
+                        trekkers = trekkers + b.members
+            stats.append({'staff': s, 'treks': len(treks_of_staff), 'trekkers': trekkers,
+                          'open': len([t for t in treks_of_staff if t.status == 'Open']),
+                          'completed': len([t for t in treks_of_staff if t.status == 'Completed'])})
     return render_template('admin_dashboard.html', treks=treks, pending=pending,
                            total_users=total_users, total_staff=total_staff,
                            total_treks=total_treks, total_bookings=total_bookings,
-                           show=show, bookings=bookings, staff_list=staff_list,
+                           show=show, bookings=bookings, staff_list=staff_list, stats=stats,
                            q=q, user=current_user())
 
 

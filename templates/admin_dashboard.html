@@ -44,6 +44,11 @@
         {% else %}
         <a href="{{ url_for('admin_dashboard', q=q, show='bookings') }}" class="btn btn-secondary">View All Bookings</a>
         {% endif %}
+        {% if show == 'staff' %}
+        <a href="{{ url_for('admin_dashboard', q=q) }}" class="btn btn-outline-primary">Hide Staff Stats</a>
+        {% else %}
+        <a href="{{ url_for('admin_dashboard', q=q, show='staff') }}" class="btn btn-primary">Staff Stats</a>
+        {% endif %}
     </div>
 </div>
 
@@ -96,6 +101,36 @@
             </div>
             <button class="btn btn-dark">Save Trek</button>
         </form>
+    </div>
+</div>
+{% endif %}
+
+{% if show == 'staff' %}
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>Staff Stats</h5>
+        <table class="table table-bordered mb-0">
+            <tr><th>ID</th><th>Name</th><th>Username</th><th>Contact</th><th>Assigned Treks</th><th>Open Treks</th><th>Completed Treks</th><th>Trekkers Registered</th><th>Status</th></tr>
+            {% for s in stats %}
+            <tr>
+                <td>{{ s.staff.id }}</td>
+                <td>{{ s.staff.name }}</td>
+                <td>{{ s.staff.username }}</td>
+                <td>{{ s.staff.phone }}</td>
+                <td>{{ s.treks }}</td>
+                <td>{{ s.open }}</td>
+                <td>{{ s.completed }}</td>
+                <td>{{ s.trekkers }}</td>
+                <td>
+                    {% if s.staff.blocked %}Blocked
+                    {% elif not s.staff.approved %}Waiting for approval
+                    {% else %}Active{% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="9">No staff registered yet</td></tr>
+            {% endfor %}
+        </table>
     </div>
 </div>
 {% endif %}
