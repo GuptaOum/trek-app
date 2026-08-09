@@ -27,6 +27,18 @@ The database is created programmatically by `db.create_all()` and the admin acco
 
 No JavaScript is used anywhere. All the searching, filtering and form handling is done on the server side.
 
+## Data Flow
+
+There is no API layer in this project. The frontend is HTML that Flask renders on the server and sends already finished, so every interaction is a full page load and no JSON or AJAX is involved.
+
+A request arrives over HTTP, Flask matches it to a route, the route checks `session['role']` and redirects to the login page if the role is wrong, then queries SQLite through SQLAlchemy. The Python objects that come back are passed to `render_template()`, Jinja2 fills the placeholders, and the finished HTML goes back to the browser.
+
+Data reaches the backend only through HTML forms. A POST form sends its fields in the body and the route reads them with `request.form`, while the search form uses GET so the values arrive in the URL and are read with `request.args`. Identity is kept in a session cookie signed with `SECRET_KEY`, which the browser returns on every request and which cannot be forged without the key.
+
+Every route that changes data answers with `redirect()` instead of rendering, so refreshing the page after a booking cannot book the same trek twice. Messages survive that redirect through `flash()`.
+
+![Data flow](docs/dataflow.svg)
+
 ## ER Diagram
 
 ```mermaid

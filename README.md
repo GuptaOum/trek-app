@@ -53,6 +53,24 @@ No JavaScript is used anywhere in the application.
 
 ---
 
+## How the frontend and backend talk
+
+There is no API in this project. No JSON, no fetch, no AJAX. The frontend is not a separate application, it is HTML that Flask builds on the server and sends to the browser already finished, so every interaction is a full page load.
+
+![Data flow](docs/dataflow.svg)
+
+**The cycle.** The browser sends an HTTP request such as `GET /trek/1` or `POST /book/1`. Flask matches the URL against a `@app.route` and calls that function. The function reads `session['role']` and redirects to the login page if the role does not match. It then queries SQLite through SQLAlchemy, gets back Python objects, and passes them to `render_template()`. Jinja2 fills the `{{ }}` and `{% for %}` placeholders and produces an HTML string, which travels back over HTTP for the browser to paint.
+
+**Sending data to the server.** The only way data reaches the backend is through an HTML form. A form with `method="post"` sends its fields in the request body and the route reads them with `request.form['members']`. The search form on the home page uses `method="get"` instead, so the values arrive in the URL as `?q=Manali&difficulty=Easy` and the route reads them with `request.args.get('q')`. Those two are the entire input surface of the application.
+
+**Remembering who is logged in.** At login the route writes `session['user_id']` and `session['role']` into a cookie signed with `SECRET_KEY`. The browser sends that cookie back on every request. A user can read the cookie but cannot forge it without the key, which is what makes the role checks trustworthy.
+
+**Post, Redirect, Get.** Every route that changes something answers with `redirect()` instead of rendering a page. This is why refreshing the browser after a booking does not book the trek a second time. Messages are passed across the redirect with `flash()`, which stores them in the session until `base.html` displays them once.
+
+**Templates.** Every page starts with `{% extends 'base.html' %}` and fills in `{% block content %}`, so the navbar, the flash area and the Bootstrap includes are written once.
+
+---
+
 ## Getting started
 
 ```bash
