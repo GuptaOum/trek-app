@@ -38,7 +38,12 @@
         <a class="nav-link {% if show == 'bookings' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='bookings') }}">All Bookings</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {% if show == 'staff' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='staff') }}">Staff Stats</a>
+        <a class="nav-link {% if show == 'staff' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='staff') }}">
+            Staff{% if pending %} <span class="badge bg-danger">{{ pending|length }}</span>{% endif %}
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if show == 'users' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='users') }}">Trekkers</a>
     </li>
 </ul>
 
@@ -106,6 +111,31 @@
 {% endif %}
 
 {% if show == 'staff' %}
+{% if pending %}
+<h5>Waiting for approval</h5>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>Name</th><th>Username</th><th>Contact</th><th>Experience</th><th>Action</th></tr>
+</thead>
+<tbody>
+    {% for s in pending %}
+    <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.username }}</td>
+        <td>{{ s.email }}<br>{{ s.phone }}</td>
+        <td>{{ s.experience }}</td>
+        <td>
+            <a href="{{ url_for('approve_staff', uid=s.id) }}" class="btn btn-sm btn-success">Approve</a>
+            <a href="{{ url_for('reject_staff', uid=s.id) }}" class="btn btn-sm btn-danger">Reject</a>
+        </td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+</div>
+<h5 class="mt-4">Working guides</h5>
+{% endif %}
 <div class="table-responsive">
 <table class="table table-bordered align-middle">
 <thead>
@@ -149,6 +179,32 @@
     </tr>
     {% else %}
     <tr><td colspan="5">No staff registered yet</td></tr>
+    {% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
+
+{% if show == 'users' %}
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>ID</th><th>Name</th><th>Username</th><th>Contact</th><th>Bookings</th><th>Status</th><th>Action</th></tr>
+</thead>
+<tbody>
+    {% for u in users %}
+    <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.name }}</td>
+        <td>{{ u.username }}</td>
+        <td>{{ u.email }}<br>{{ u.phone }}</td>
+        <td>{{ u.bookings|length }}</td>
+        <td>{% if u.blocked %}Blocked{% else %}Active{% endif %}</td>
+        <td><a href="{{ url_for('block_user', uid=u.id) }}" class="btn btn-sm btn-outline-warning">
+            {% if u.blocked %}Unblock{% else %}Block{% endif %}</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No trekkers registered yet</td></tr>
     {% endfor %}
 </tbody>
 </table>

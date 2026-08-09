@@ -16,9 +16,7 @@
             <a class="nav-link {% if request.endpoint in ['home', 'trek_details'] %}active-link{% endif %}" href="{{ url_for('home') }}">Treks</a>
             {% if user %}
                 {% if user.role == 'admin' %}
-                    <a class="nav-link {% if request.endpoint in ['admin_dashboard', 'add_trek', 'edit_trek', 'assign_staff', 'all_bookings'] %}active-link{% endif %}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
-                    <a class="nav-link {% if request.endpoint == 'manage_staff' %}active-link{% endif %}" href="{{ url_for('manage_staff') }}">Staff</a>
-                    <a class="nav-link {% if request.endpoint == 'manage_users' %}active-link{% endif %}" href="{{ url_for('manage_users') }}">Users</a>
+                    <a class="nav-link {% if request.endpoint in ['admin_dashboard', 'add_trek', 'edit_trek', 'assign_staff', 'delete_trek'] %}active-link{% endif %}" href="{{ url_for('admin_dashboard') }}">Dashboard</a>
                 {% elif user.role == 'staff' %}
                     <a class="nav-link {% if request.endpoint in ['staff_dashboard', 'staff_trek'] %}active-link{% endif %}" href="{{ url_for('staff_dashboard') }}">My Treks</a>
                 {% else %}

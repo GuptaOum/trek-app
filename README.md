@@ -160,16 +160,16 @@ There is a single `User` table for all three roles because all of them log in th
 
 | Endpoint | Method | Description |
 |---|---|---|
-| `/admin` | GET | Dashboard with summary counts |
+| `/admin` | GET | Dashboard, `?show=` switches between treks, add trek, bookings, staff and trekkers |
 | `/admin/trek/add` | GET, POST | Create a trek |
 | `/admin/trek/edit/<id>` | GET, POST | Edit a trek |
 | `/admin/trek/delete/<id>` | GET | Delete a trek |
 | `/admin/trek/assign/<id>` | GET, POST | Assign a guide |
-| `/admin/staff` | GET | Pending and approved guides |
+| `/admin/staff` | GET | Redirects to the staff tab |
 | `/admin/staff/approve/<id>` | GET | Approve a guide |
 | `/admin/staff/reject/<id>` | GET | Reject a guide |
-| `/admin/users` | GET | All registered trekkers, searchable |
-| `/admin/bookings` | GET | Every booking, searchable |
+| `/admin/users` | GET | Redirects to the trekkers tab |
+| `/admin/bookings` | GET | Redirects to the bookings tab |
 | `/admin/block/<id>` | GET | Block or unblock |
 
 ### Trek staff

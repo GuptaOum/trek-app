@@ -148,9 +148,18 @@ def admin_dashboard():
     staff_list = []
     if show == 'add':
         staff_list = User.query.filter_by(role='staff', approved=True, blocked=False).all()
+    users = []
+    if show == 'users':
+        users = User.query.filter_by(role='user')
+        if q:
+            if q.isdigit():
+                users = users.filter_by(id=int(q))
+            else:
+                users = users.filter(User.name.like('%' + q + '%'))
+        users = users.all()
     stats = []
     if show == 'staff':
-        for s in User.query.filter_by(role='staff').order_by(User.name).all():
+        for s in User.query.filter_by(role='staff', approved=True).order_by(User.name).all():
             assigned = Trek.query.filter_by(staff_id=s.id).order_by(Trek.id).all()
             capacity = 0
             filled = 0
@@ -162,22 +171,14 @@ def admin_dashboard():
                            total_users=total_users, total_staff=total_staff,
                            total_treks=total_treks, total_bookings=total_bookings,
                            show=show, bookings=bookings, staff_list=staff_list, stats=stats,
-                           q=q, user=current_user())
+                           users=users, q=q, user=current_user())
 
 
 @app.route('/admin/bookings')
 def all_bookings():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
-    q = request.args.get('q', '')
-    bookings = Booking.query.join(Trek).join(User, Booking.user_id == User.id)
-    if q:
-        if q.isdigit():
-            bookings = bookings.filter(Booking.id == int(q))
-        else:
-            bookings = bookings.filter(db.or_(User.name.like('%' + q + '%'), Trek.name.like('%' + q + '%')))
-    bookings = bookings.all()
-    return render_template('admin_bookings.html', bookings=bookings, q=q, user=current_user())
+    return redirect(url_for('admin_dashboard', show='bookings'))
 
 
 @app.route('/admin/trek/add', methods=['GET', 'POST'])
@@ -275,16 +276,7 @@ def assign_staff(tid):
 def manage_staff():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
-    q = request.args.get('q', '')
-    pending = User.query.filter_by(role='staff', approved=False).all()
-    approved = User.query.filter_by(role='staff', approved=True)
-    if q:
-        if q.isdigit():
-            approved = approved.filter_by(id=int(q))
-        else:
-            approved = approved.filter(User.name.like('%' + q + '%'))
-    approved = approved.all()
-    return render_template('admin_staff.html', pending=pending, approved=approved, q=q, user=current_user())
+    return redirect(url_for('admin_dashboard', show='staff'))
 
 
 @app.route('/admin/staff/approve/<int:uid>')
@@ -295,7 +287,7 @@ def approve_staff(uid):
     staff.approved = True
     db.session.commit()
     flash('Staff approved', 'success')
-    return redirect(url_for('manage_staff'))
+    return redirect(url_for('admin_dashboard', show='staff'))
 
 
 @app.route('/admin/staff/reject/<int:uid>')
@@ -306,22 +298,14 @@ def reject_staff(uid):
     db.session.delete(staff)
     db.session.commit()
     flash('Staff request rejected', 'success')
-    return redirect(url_for('manage_staff'))
+    return redirect(url_for('admin_dashboard', show='staff'))
 
 
 @app.route('/admin/users')
 def manage_users():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
-    q = request.args.get('q', '')
-    users = User.query.filter_by(role='user')
-    if q:
-        if q.isdigit():
-            users = users.filter_by(id=int(q))
-        else:
-            users = users.filter(User.name.like('%' + q + '%'))
-    users = users.all()
-    return render_template('admin_users.html', users=users, q=q, user=current_user())
+    return redirect(url_for('admin_dashboard', show='users'))
 
 
 @app.route('/admin/block/<int:uid>')
@@ -335,8 +319,8 @@ def block_user(uid):
     person.blocked = not person.blocked
     db.session.commit()
     if person.role == 'staff':
-        return redirect(url_for('manage_staff'))
-    return redirect(url_for('manage_users'))
+        return redirect(url_for('admin_dashboard', show='staff'))
+    return redirect(url_for('admin_dashboard', show='users'))
 
 
 @app.route('/staff')
