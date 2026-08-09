@@ -141,9 +141,17 @@ def admin_dashboard():
     total_staff = User.query.filter_by(role='staff').count()
     total_treks = Trek.query.count()
     total_bookings = Booking.query.filter_by(status='Booked').count()
+    show = request.args.get('show', '')
+    bookings = []
+    if show == 'bookings':
+        bookings = Booking.query.all()
+    staff_list = []
+    if show == 'add':
+        staff_list = User.query.filter_by(role='staff', approved=True, blocked=False).all()
     return render_template('admin_dashboard.html', treks=treks, pending=pending,
                            total_users=total_users, total_staff=total_staff,
                            total_treks=total_treks, total_bookings=total_bookings,
+                           show=show, bookings=bookings, staff_list=staff_list,
                            q=q, user=current_user())
 
 
