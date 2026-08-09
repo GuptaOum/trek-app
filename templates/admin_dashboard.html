@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Admin Dashboard</h3>
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center p-3">Total Treks<h4>{{ treks|length }}</h4></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">Total Users<h4>{{ total_users }}</h4></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">Active Bookings<h4>{{ total_bookings }}</h4></div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3">Pending Staff<h4>{{ pending|length }}</h4></div>
+    </div>
+</div>
+<a href="{{ url_for('add_trek') }}" class="btn btn-dark mb-3">Add New Trek</a>
+<table class="table table-bordered">
+    <tr>
+        <th>ID</th><th>Name</th><th>Location</th><th>Difficulty</th><th>Duration</th>
+        <th>Slots</th><th>Status</th><th>Staff</th><th>Action</th>
+    </tr>
+    {% for t in treks %}
+    <tr>
+        <td>{{ t.id }}</td>
+        <td>{{ t.name }}</td>
+        <td>{{ t.location }}</td>
+        <td>{{ t.difficulty }}</td>
+        <td>{{ t.duration }}</td>
+        <td>{{ t.available_slots }}/{{ t.total_slots }}</td>
+        <td>{{ t.status }}</td>
+        <td>{% if t.staff %}{{ t.staff.name }}{% else %}Not assigned{% endif %}</td>
+        <td>
+            <a href="{{ url_for('edit_trek', tid=t.id) }}" class="btn btn-sm btn-primary">Edit</a>
+            <a href="{{ url_for('assign_staff', tid=t.id) }}" class="btn btn-sm btn-secondary">Assign</a>
+            <a href="{{ url_for('delete_trek', tid=t.id) }}" class="btn btn-sm btn-danger">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

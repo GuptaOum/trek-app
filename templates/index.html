@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Available Treks</h3>
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-5">
+        <input type="text" name="q" class="form-control" placeholder="Search by name or location" value="{{ q }}">
+    </div>
+    <div class="col-md-4">
+        <select name="difficulty" class="form-select">
+            <option value="">All Difficulty</option>
+            <option value="Easy" {% if difficulty == 'Easy' %}selected{% endif %}>Easy</option>
+            <option value="Moderate" {% if difficulty == 'Moderate' %}selected{% endif %}>Moderate</option>
+            <option value="Difficult" {% if difficulty == 'Difficult' %}selected{% endif %}>Difficult</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <button class="btn btn-dark w-100">Search</button>
+    </div>
+</form>
+<div class="row">
+    {% for t in treks %}
+    <div class="col-md-4 mb-3">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ t.name }}</h5>
+                <p class="mb-1">Location: {{ t.location }}</p>
+                <p class="mb-1">Difficulty: {{ t.difficulty }}</p>
+                <p class="mb-1">Duration: {{ t.duration }} days</p>
+                <p class="mb-1">Price: Rs {{ t.price }}</p>
+                <p class="mb-1">Slots left: {{ t.available_slots }}</p>
+                <p class="mb-2">Status: {{ t.status }}</p>
+                <a href="{{ url_for('trek_details', tid=t.id) }}" class="btn btn-sm btn-primary">View</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p>No treks found.</p>
+    {% endfor %}
+</div>
+{% endblock %}

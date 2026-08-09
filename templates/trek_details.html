@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h3>{{ trek.name }}</h3>
+        <p>{{ trek.description }}</p>
+        <ul class="list-group">
+            <li class="list-group-item">Location: {{ trek.location }}</li>
+            <li class="list-group-item">Difficulty: {{ trek.difficulty }}</li>
+            <li class="list-group-item">Duration: {{ trek.duration }} days</li>
+            <li class="list-group-item">Price: Rs {{ trek.price }}</li>
+            <li class="list-group-item">Start Date: {{ trek.start_date }}</li>
+            <li class="list-group-item">Available Slots: {{ trek.available_slots }}</li>
+            <li class="list-group-item">Status: {{ trek.status }}</li>
+            <li class="list-group-item">Guide: {% if trek.staff %}{{ trek.staff.name }}{% else %}To be assigned{% endif %}</li>
+        </ul>
+    </div>
+    <div class="col-md-4">
+        {% if user and user.role == 'user' %}
+            {% if trek.status == 'Upcoming' and trek.available_slots > 0 %}
+            <form method="post" action="{{ url_for('book_trek', tid=trek.id) }}">
+                <div class="mb-3">
+                    <label class="form-label">Number of Members</label>
+                    <input type="number" name="members" class="form-control" value="1" min="1" max="{{ trek.available_slots }}" required>
+                </div>
+                <button class="btn btn-success">Book Now</button>
+            </form>
+            {% else %}
+            <p class="text-danger">Booking not available</p>
+            {% endif %}
+        {% elif not user %}
+            <a href="{{ url_for('login') }}" class="btn btn-dark">Login to book</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

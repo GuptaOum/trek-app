@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>My Assigned Treks</h3>
+<table class="table table-bordered">
+    <tr><th>ID</th><th>Name</th><th>Location</th><th>Start Date</th><th>Slots</th><th>Status</th><th>Action</th></tr>
+    {% for t in treks %}
+    <tr>
+        <td>{{ t.id }}</td>
+        <td>{{ t.name }}</td>
+        <td>{{ t.location }}</td>
+        <td>{{ t.start_date }}</td>
+        <td>{{ t.available_slots }}/{{ t.total_slots }}</td>
+        <td>{{ t.status }}</td>
+        <td><a href="{{ url_for('staff_trek', tid=t.id) }}" class="btn btn-sm btn-primary">Manage</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No trek assigned to you yet</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h3>Trek Staff Registration</h3>
+        <p class="text-muted">Your account will be active after admin approval.</p>
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input type="text" name="username" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" name="password" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" name="phone" class="form-control">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Experience</label>
+                <textarea name="experience" class="form-control" rows="3"></textarea>
+            </div>
+            <button class="btn btn-dark">Send Request</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

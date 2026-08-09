@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3>Pending Staff Requests</h3>
+<table class="table table-bordered">
+    <tr><th>Name</th><th>Username</th><th>Email</th><th>Experience</th><th>Action</th></tr>
+    {% for s in pending %}
+    <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.username }}</td>
+        <td>{{ s.email }}</td>
+        <td>{{ s.experience }}</td>
+        <td>
+            <a href="{{ url_for('approve_staff', uid=s.id) }}" class="btn btn-sm btn-success">Approve</a>
+            <a href="{{ url_for('reject_staff', uid=s.id) }}" class="btn btn-sm btn-danger">Reject</a>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5">No pending requests</td></tr>
+    {% endfor %}
+</table>
+<h3 class="mt-4">Approved Staff</h3>
+<table class="table table-bordered">
+    <tr><th>Name</th><th>Username</th><th>Email</th><th>Treks</th><th>Status</th><th>Action</th></tr>
+    {% for s in approved %}
+    <tr>
+        <td>{{ s.name }}</td>
+        <td>{{ s.username }}</td>
+        <td>{{ s.email }}</td>
+        <td>{{ s.treks|length }}</td>
+        <td>{% if s.blocked %}Blocked{% else %}Active{% endif %}</td>
+        <td><a href="{{ url_for('block_user', uid=s.id) }}" class="btn btn-sm btn-warning">
+            {% if s.blocked %}Unblock{% else %}Block{% endif %}</a></td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">No staff yet</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}
