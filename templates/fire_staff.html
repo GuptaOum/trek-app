@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Remove {{ staff.name }} | Trek Manager{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard', show='staff') }}">Staff</a></li>
+                <li class="breadcrumb-item active">Remove staff</li>
+            </ol>
+        </nav>
+        <h3>Remove {{ staff.name }} from the team</h3>
+        <p class="text-muted">{{ staff.username }} | {{ staff.email }} | {{ staff.phone }}</p>
+
+        {% if assigned %}
+        <div class="alert alert-warning">
+            {{ assigned|length }} trek{% if assigned|length != 1 %}s{% endif %} assigned to this guide will become
+            unassigned and will need a new guide:
+            {% for t in assigned %}{{ t.name }}{% if not loop.last %}, {% endif %}{% endfor %}.
+            The treks and their bookings are not deleted.
+        </div>
+        {% else %}
+        <p class="text-muted">No trek is assigned to this guide right now.</p>
+        {% endif %}
+
+        <form method="post">
+            <div class="mb-3">
+                <label class="form-label" for="letter">Letter for {{ staff.name }}</label>
+                <textarea id="letter" name="letter" class="form-control" rows="12" required>Dear {{ staff.name }},
+
+We are writing to let you know that your engagement as a trek guide with Trek Manager is ending with effect from today.
+
+Any treks assigned to you have been handed over to the office and will be given to another guide. Please return any equipment issued to you and share your handover notes for the treks you were leading.
+
+We thank you for the time you spent guiding with us and wish you well.
+
+Regards,
+Trek Manager Admin</textarea>
+                <small class="text-muted">This letter is saved and shown to the guide the next time they log in.</small>
+            </div>
+            <button class="btn btn-danger">Remove staff and send letter</button>
+            <a href="{{ url_for('admin_dashboard', show='staff') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

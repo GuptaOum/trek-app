@@ -147,7 +147,7 @@ def admin_dashboard():
         bookings = Booking.query.all()
     staff_list = []
     if show == 'add':
-        staff_list = User.query.filter_by(role='staff', approved=True, blocked=False).all()
+        staff_list = User.query.filter_by(role='staff', approved=True, blocked=False, fired=False).all()
     users = []
     if show == 'users':
         users = User.query.filter_by(role='user')
@@ -157,9 +157,12 @@ def admin_dashboard():
             else:
                 users = users.filter(User.name.like('%' + q + '%'))
         users = users.all()
+    removed = []
+    if show == 'staff':
+        removed = User.query.filter_by(role='staff', fired=True).order_by(User.name).all()
     stats = []
     if show == 'staff':
-        for s in User.query.filter_by(role='staff', approved=True).order_by(User.name).all():
+        for s in User.query.filter_by(role='staff', approved=True, fired=False).order_by(User.name).all():
             assigned = Trek.query.filter_by(staff_id=s.id).order_by(Trek.id).all()
             capacity = 0
             filled = 0
@@ -171,7 +174,7 @@ def admin_dashboard():
                            total_users=total_users, total_staff=total_staff,
                            total_treks=total_treks, total_bookings=total_bookings,
                            show=show, bookings=bookings, staff_list=staff_list, stats=stats,
-                           users=users, q=q, user=current_user())
+                           users=users, removed=removed, q=q, user=current_user())
 
 
 @app.route('/admin/bookings')
@@ -255,14 +258,14 @@ def assign_staff(tid):
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
     trek = Trek.query.get_or_404(tid)
-    staff_list = User.query.filter_by(role='staff', approved=True, blocked=False).all()
+    staff_list = User.query.filter_by(role='staff', approved=True, blocked=False, fired=False).all()
     if request.method == 'POST':
         sid = request.form['staff_id']
         if sid == '':
             trek.staff_id = None
         else:
             staff = User.query.get(int(sid))
-            if staff is None or staff.role != 'staff' or not staff.approved or staff.blocked:
+            if staff is None or staff.role != 'staff' or not staff.approved or staff.blocked or staff.fired:
                 flash('This staff cannot be assigned', 'danger')
                 return redirect(url_for('assign_staff', tid=tid))
             trek.staff_id = staff.id
@@ -299,6 +302,31 @@ def reject_staff(uid):
     db.session.commit()
     flash('Staff request rejected', 'success')
     return redirect(url_for('admin_dashboard', show='staff'))
+
+
+@app.route('/admin/staff/fire/<int:uid>', methods=['GET', 'POST'])
+def fire_staff(uid):
+    if session.get('role') != 'admin':
+        return redirect(url_for('login'))
+    staff = User.query.get_or_404(uid)
+    if staff.role != 'staff':
+        flash('Only trek staff can be removed this way', 'danger')
+        return redirect(url_for('admin_dashboard', show='staff'))
+    assigned = Trek.query.filter_by(staff_id=staff.id).all()
+    if request.method == 'POST':
+        letter = request.form['letter'].strip()
+        if not letter:
+            flash('Please write the letter before removing the staff', 'danger')
+            return redirect(url_for('fire_staff', uid=uid))
+        for t in assigned:
+            t.staff_id = None
+        staff.fired = True
+        staff.fired_on = str(date.today())
+        staff.fire_letter = letter
+        db.session.commit()
+        flash(staff.name + ' has been removed and the letter is waiting on their dashboard', 'success')
+        return redirect(url_for('admin_dashboard', show='staff'))
+    return render_template('fire_staff.html', staff=staff, assigned=assigned, user=current_user())
 
 
 @app.route('/admin/users')

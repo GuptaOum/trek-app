@@ -12,6 +12,13 @@
         <small class="text-muted">Treks assigned to you by the admin</small>
     </div>
 </div>
+{% if user.fired %}
+<div class="alert alert-danger">
+    <h5>Letter from the admin</h5>
+    <p class="text-muted mb-2">Dated {{ user.fired_on }}</p>
+    <div style="white-space: pre-wrap;">{{ user.fire_letter }}</div>
+</div>
+{% endif %}
 <h3>My Assigned Treks</h3>
 <div class="table-responsive">
 <table class="table table-bordered align-middle">

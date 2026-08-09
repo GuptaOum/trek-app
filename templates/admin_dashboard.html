@@ -175,6 +175,7 @@
             <br>
             <a href="{{ url_for('block_user', uid=s.staff.id) }}" class="btn btn-sm btn-outline-warning py-0 mt-1">
                 {% if s.staff.blocked %}Unblock{% else %}Block{% endif %}</a>
+            <a href="{{ url_for('fire_staff', uid=s.staff.id) }}" class="btn btn-sm btn-outline-danger py-0 mt-1">Remove</a>
         </td>
     </tr>
     {% else %}
@@ -183,6 +184,26 @@
 </tbody>
 </table>
 </div>
+{% if removed %}
+<h5 class="mt-4">Removed from the team</h5>
+<div class="table-responsive">
+<table class="table table-bordered align-middle">
+<thead>
+    <tr><th>Name</th><th>Contact</th><th>Removed On</th><th>Letter Sent</th></tr>
+</thead>
+<tbody>
+    {% for s in removed %}
+    <tr>
+        <td>{{ s.name }}<br><small class="text-muted">{{ s.username }}</small></td>
+        <td>{{ s.email }}<br>{{ s.phone }}</td>
+        <td>{{ s.fired_on }}</td>
+        <td><small>{{ s.fire_letter[:160] }}{% if s.fire_letter|length > 160 %}...{% endif %}</small></td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
+</div>
+{% endif %}
 {% endif %}
 
 {% if show == 'users' %}

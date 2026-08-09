@@ -36,6 +36,8 @@ A trek moves through `Pending`, `Approved`, `Open`, `Closed` and `Completed`. Ne
 
 **Booking history is preserved.** Cancelling never deletes a row, it changes the status to `Cancelled` and returns the seats. When a guide marks a trek `Completed`, all its active bookings become `Completed` too.
 
+**Removing a guide.** The admin can remove a guide from the team by writing a letter to them. The app fills a draft the admin can edit, unassigns every trek held by that guide so it can be given to someone else, and keeps the treks and their bookings untouched. The letter is saved with the date and the guide sees it on their dashboard the next time they log in. A removed guide no longer appears in the assignment dropdown and cannot be assigned even if the id is forced.
+
 **Blacklisting.** A blocked user or guide cannot log in, and a blocked user cannot book.
 
 **Profile and photo.** Every role can edit their own details and upload a profile picture, shown as a round avatar in the navbar. Uploads are limited to png, jpg, jpeg and gif under 2 MB and are saved under the user id, and anyone without a photo gets a circle with their initial.
@@ -171,6 +173,7 @@ There is a single `User` table for all three roles because all of them log in th
 | `/admin/users` | GET | Redirects to the trekkers tab |
 | `/admin/bookings` | GET | Redirects to the bookings tab |
 | `/admin/block/<id>` | GET | Block or unblock |
+| `/admin/staff/fire/<id>` | GET, POST | Write the letter and remove a guide from the team |
 
 ### Trek staff
 

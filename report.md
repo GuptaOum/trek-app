@@ -122,6 +122,7 @@ The `role` column decides whether a User row is an admin, a staff or a trekker. 
 | `/admin/users` | GET | List of all registered trekkers, searchable by name or ID |
 | `/admin/bookings` | GET | Every booking in the system, searchable |
 | `/admin/block/<uid>` | GET | Block or unblock a user or a staff |
+| `/admin/staff/fire/<uid>` | GET, POST | Write the letter and remove a guide from the team |
 
 ### Trek Staff
 
@@ -149,6 +150,8 @@ The `role` column decides whether a User row is an admin, a staff or a trekker. 
 **Role based access control.** Every admin, staff and user route checks the role stored in the session. A staff member can open only the treks assigned to them, checked by comparing `trek.staff_id` with the logged in staff id.
 
 **Staff approval workflow.** A staff account is created with `approved = False` and the login is refused with a message until the admin approves it. Only approved and unblocked staff appear in the assignment dropdown.
+
+**Removing a guide.** The admin can remove a trek guide by writing a letter to them. Every trek held by that guide is unassigned so it can be given to someone else, the treks and their bookings are kept, and the letter is stored with the date and shown to the guide on their dashboard the next time they log in. A removed guide cannot be assigned to any trek after that.
 
 **Blacklisting.** The admin can block a user or a staff. A blocked account cannot log in and a blocked user cannot book.
 
