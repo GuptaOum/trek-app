@@ -2,12 +2,6 @@
 
 A web based trekking management system where an admin manages treks, trek guides manage the treks assigned to them, and trekkers search and book available slots. Built with Flask, Jinja2, Bootstrap and SQLite.
 
-![Python](https://img.shields.io/badge/Python-3.14-blue)
-![Flask](https://img.shields.io/badge/Flask-3.0.3-black)
-![SQLite](https://img.shields.io/badge/SQLite-database-003B57)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3)
-![No JavaScript](https://img.shields.io/badge/JavaScript-none-lightgrey)
-
 ---
 
 ## What it does
@@ -73,8 +67,6 @@ No JavaScript is used anywhere in the application.
 ## How the frontend and backend talk
 
 There is no API in this project. No JSON, no fetch, no AJAX. The frontend is not a separate application, it is HTML that Flask builds on the server and sends to the browser already finished, so every interaction is a full page load.
-
-![Data flow](docs/dataflow.svg)
 
 **The cycle.** The browser sends an HTTP request such as `GET /trek/1` or `POST /book/1`. Flask matches the URL against a `@app.route` and calls that function. The function reads `session['role']` and redirects to the login page if the role does not match. It then queries SQLite through SQLAlchemy, gets back Python objects, and passes them to `render_template()`. Jinja2 fills the `{{ }}` and `{% for %}` placeholders and produces an HTML string, which travels back over HTTP for the browser to paint.
 
@@ -220,11 +212,12 @@ trek_app/
     ├── login.html
     ├── register.html
     ├── staff_register.html
+    ├── profile.html
     ├── admin_dashboard.html
-    ├── admin_staff.html
-    ├── admin_users.html
     ├── trek_form.html
     ├── assign.html
+    ├── confirm_delete.html
+    ├── fire_staff.html
     ├── staff_dashboard.html
     ├── staff_trek.html
     └── user_dashboard.html

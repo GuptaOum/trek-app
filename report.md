@@ -37,8 +37,6 @@ Data reaches the backend only through HTML forms. A POST form sends its fields i
 
 Every route that changes data answers with `redirect()` instead of rendering, so refreshing the page after a booking cannot book the same trek twice. Messages survive that redirect through `flash()`.
 
-![Data flow](docs/dataflow.svg)
-
 ## ER Diagram
 
 ```mermaid
