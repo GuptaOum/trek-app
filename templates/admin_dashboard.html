@@ -116,6 +116,15 @@
 {% endif %}
 
 {% if show == 'staff' %}
+<form method="get" class="d-flex mb-3">
+    <input type="hidden" name="show" value="staff">
+    <input type="text" name="q" class="form-control me-2" placeholder="Search guide by name or ID" value="{{ q }}">
+    <button class="btn btn-dark">Search</button>
+</form>
+{% if q %}
+<p class="text-muted">Guides matching "{{ q }}"
+    <a href="{{ url_for('admin_dashboard', show='staff') }}" class="ms-2">Clear search</a></p>
+{% endif %}
 <p class="text-muted">
     {{ total_treks }} treks in total, {{ assigned_count }} with a guide,
     <b>{{ unassigned|length }} still without one</b>.

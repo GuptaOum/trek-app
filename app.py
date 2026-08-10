@@ -175,7 +175,13 @@ def admin_dashboard():
         assigned_count = Trek.query.filter(Trek.staff_id.isnot(None)).count()
     stats = []
     if show == 'staff':
-        for s in User.query.filter_by(role='staff', approved=True, fired=False).order_by(User.name).all():
+        working = User.query.filter_by(role='staff', approved=True, fired=False)
+        if q:
+            if q.isdigit():
+                working = working.filter_by(id=int(q))
+            else:
+                working = working.filter(User.name.like('%' + q + '%'))
+        for s in working.order_by(User.name).all():
             assigned = Trek.query.filter_by(staff_id=s.id).order_by(Trek.id).all()
             capacity = 0
             filled = 0
