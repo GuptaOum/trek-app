@@ -53,6 +53,11 @@
                     <option value="Closed" {% if trek.status == 'Closed' %}selected{% endif %}>Closed</option>
                     <option value="Completed" {% if trek.status == 'Completed' %}selected{% endif %}>Completed</option>
                 </select>
+                <small class="text-muted">
+                    Pending is hidden from trekkers, Approved is visible but not bookable,
+                    Open is the only status people can book in, Closed means the trek has started,
+                    Completed means it is over.
+                </small>
             </div>
             {% endif %}
             <div class="mb-3">

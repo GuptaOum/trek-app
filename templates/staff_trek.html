@@ -23,6 +23,10 @@
                     <option value="Closed" {% if trek.status == 'Closed' %}selected{% endif %}>Closed, trek started</option>
                     <option value="Completed" {% if trek.status == 'Completed' %}selected{% endif %}>Completed</option>
                 </select>
+                <small class="text-muted">
+                    Open means people can still book. Closed stops new bookings once the trek starts.
+                    Completed also marks everyone on the list as Completed.
+                </small>
             </div>
             <button class="btn btn-dark">Update</button>
         </form>

@@ -24,6 +24,15 @@ The application solves one main problem: keeping the slot count of a trek correc
 
 A trek moves through `Pending`, `Approved`, `Open`, `Closed` and `Completed`. New treks start as `Pending` and stay hidden from trekkers until the admin approves them. Only a trek that is `Open` can be booked, and only the assigned guide can move it to `Closed` or `Completed`.
 
+
+### What the statuses mean
+
+A trek and a booking each have their own status, and the words are not the same thing.
+
+**Trek status** is where the trek itself has reached. `Pending` is a new trek that trekkers cannot see, `Approved` is visible but not open for booking, `Open` is the only status in which a trek can be booked, `Closed` means the trek has started and takes no more bookings, and `Completed` means it is over.
+
+**Booking status** is one person's seat on one trek. `Booked` means the seat is held and counted against the slots, `Cancelled` means the person gave it up and the seats went back to the pool while the row stays for history, and `Completed` means they went on the trek. Marking a trek `Completed` moves all of its active bookings to `Completed` as well.
+
 ---
 
 ## Features
