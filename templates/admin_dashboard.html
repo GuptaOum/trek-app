@@ -35,14 +35,22 @@
         <a class="nav-link {% if show == 'add' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='add') }}">Add New Trek</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {% if show == 'staff' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='staff') }}">
-            Staff{% if pending %} <span class="badge bg-danger">{{ pending|length }}</span>{% endif %}
+        <a class="nav-link {% if show in ['staff', 'users'] %}active{% endif %}" href="{{ url_for('admin_dashboard', show='staff') }}">
+            People{% if pending %} <span class="badge bg-danger">{{ pending|length }}</span>{% endif %}
         </a>
     </li>
-    <li class="nav-item">
-        <a class="nav-link {% if show == 'users' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='users') }}">Trekkers</a>
-    </li>
 </ul>
+
+{% if show in ['staff', 'users'] %}
+<div class="btn-group mb-3">
+    <a href="{{ url_for('admin_dashboard', show='staff') }}"
+       class="btn btn-{% if show != 'staff' %}outline-{% endif %}dark">
+        Guides{% if pending %} ({{ pending|length }} waiting){% endif %}
+    </a>
+    <a href="{{ url_for('admin_dashboard', show='users') }}"
+       class="btn btn-{% if show != 'users' %}outline-{% endif %}dark">Trekkers</a>
+</div>
+{% endif %}
 
 {% if not show %}
 <form method="get" class="row g-2 mb-3">
