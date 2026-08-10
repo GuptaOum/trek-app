@@ -167,7 +167,7 @@ The database file is created automatically at `instance/trek.db` on the first ru
 
 ## Video Link
 
-<add the unlisted video link here before submitting>
+https://drive.google.com/file/d/1Jvws7xHCy_ZtOc8zxCMN6l-HkvWyZHqo/view?usp=sharing
 
 ## AI Declaration
 
