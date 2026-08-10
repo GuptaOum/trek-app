@@ -35,9 +35,6 @@
         <a class="nav-link {% if show == 'add' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='add') }}">Add New Trek</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link {% if show == 'bookings' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='bookings') }}">All Bookings</a>
-    </li>
-    <li class="nav-item">
         <a class="nav-link {% if show == 'staff' %}active{% endif %}" href="{{ url_for('admin_dashboard', show='staff') }}">
             Staff{% if pending %} <span class="badge bg-danger">{{ pending|length }}</span>{% endif %}
         </a>
@@ -206,7 +203,15 @@
 {% endif %}
 {% endif %}
 
-{% if show == 'users' %}
+{% if show == 'users' and not uid %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <form method="get" class="d-flex">
+        <input type="hidden" name="show" value="users">
+        <input type="text" name="q" class="form-control me-2" placeholder="Search trekker by name or ID" value="{{ q }}">
+        <button class="btn btn-dark">Search</button>
+    </form>
+    <a href="{{ url_for('admin_dashboard', show='users', uid='all') }}" class="btn btn-secondary">See every booking</a>
+</div>
 <div class="table-responsive">
 <table class="table table-bordered align-middle">
 <thead>
@@ -219,7 +224,13 @@
         <td>{{ u.name }}</td>
         <td>{{ u.username }}</td>
         <td>{{ u.email }}<br>{{ u.phone }}</td>
-        <td>{{ u.bookings|length }}</td>
+        <td>
+            {% if u.bookings %}
+            <a href="{{ url_for('admin_dashboard', show='users', uid=u.id) }}">{{ u.bookings|length }} booking{% if u.bookings|length != 1 %}s{% endif %}</a>
+            {% else %}
+            <span class="text-muted">none</span>
+            {% endif %}
+        </td>
         <td>{% if u.blocked %}Blocked{% else %}Active{% endif %}</td>
         <td><a href="{{ url_for('block_user', uid=u.id) }}" class="btn btn-sm btn-outline-warning">
             {% if u.blocked %}Unblock{% else %}Block{% endif %}</a></td>
@@ -232,24 +243,40 @@
 </div>
 {% endif %}
 
-{% if show == 'bookings' %}
+{% if show == 'users' and uid %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin_dashboard', show='users') }}">Trekkers</a></li>
+        <li class="breadcrumb-item active">{% if shown_user %}{{ shown_user.name }}{% else %}Every booking{% endif %}</li>
+    </ol>
+</nav>
+{% if shown_user %}
+<h5>Bookings by {{ shown_user.name }}</h5>
+<p class="text-muted">{{ shown_user.email }} | {{ shown_user.phone }}</p>
+{% else %}
+<h5>Every booking</h5>
+{% endif %}
 <div class="table-responsive">
 <table class="table table-bordered align-middle">
 <thead>
-            <tr><th>ID</th><th>User</th><th>Trek</th><th>Location</th><th>Members</th><th>Booked On</th><th>Status</th></tr></thead>
+    <tr><th>ID</th>{% if not shown_user %}<th>Trekker</th>{% endif %}<th>Trek</th><th>Location</th><th>Start Date</th><th>Members</th><th>Booked On</th><th>Status</th></tr>
+</thead>
 <tbody>
-            {% for b in bookings %}
-            <tr>
-                <td>{{ b.id }}</td>
-                <td>{{ b.user.name }}</td>
-                <td>{{ b.trek.name }}</td>
-                <td>{{ b.trek.location }}</td>
-                <td>{{ b.members }}</td>
-                <td>{{ b.booked_on }}</td>
-                <td>{{ b.status }}</td>
-            </tr>
+    {% for b in bookings %}
+    <tr>
+        <td>{{ b.id }}</td>
+        {% if not shown_user %}
+        <td><a href="{{ url_for('admin_dashboard', show='users', uid=b.user_id) }}">{{ b.user.name }}</a></td>
+        {% endif %}
+        <td><a href="{{ url_for('trek_details', tid=b.trek_id) }}">{{ b.trek.name }}</a></td>
+        <td>{{ b.trek.location }}</td>
+        <td>{{ b.trek.start_date }}</td>
+        <td>{{ b.members }}</td>
+        <td>{{ b.booked_on }}</td>
+        <td>{{ b.status }}</td>
+    </tr>
     {% else %}
-    <tr><td colspan="7">No bookings yet</td></tr>
+    <tr><td colspan="8">No bookings to show</td></tr>
     {% endfor %}
 </tbody>
 </table>

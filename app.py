@@ -142,14 +142,20 @@ def admin_dashboard():
     total_treks = Trek.query.count()
     total_bookings = Booking.query.filter_by(status='Booked').count()
     show = request.args.get('show', '')
+    uid = request.args.get('uid', '')
     bookings = []
-    if show == 'bookings':
-        bookings = Booking.query.all()
+    shown_user = None
+    if show == 'users' and uid:
+        if uid == 'all':
+            bookings = Booking.query.all()
+        else:
+            shown_user = User.query.get(int(uid))
+            bookings = Booking.query.filter_by(user_id=int(uid)).all()
     staff_list = []
     if show == 'add':
         staff_list = User.query.filter_by(role='staff', approved=True, blocked=False, fired=False).all()
     users = []
-    if show == 'users':
+    if show == 'users' and not uid:
         users = User.query.filter_by(role='user')
         if q:
             if q.isdigit():
@@ -174,14 +180,15 @@ def admin_dashboard():
                            total_users=total_users, total_staff=total_staff,
                            total_treks=total_treks, total_bookings=total_bookings,
                            show=show, bookings=bookings, staff_list=staff_list, stats=stats,
-                           users=users, removed=removed, q=q, user=current_user())
+                           users=users, removed=removed, uid=uid, shown_user=shown_user,
+                           q=q, user=current_user())
 
 
 @app.route('/admin/bookings')
 def all_bookings():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
-    return redirect(url_for('admin_dashboard', show='bookings'))
+    return redirect(url_for('admin_dashboard', show='users', uid='all'))
 
 
 @app.route('/admin/trek/add', methods=['GET', 'POST'])
