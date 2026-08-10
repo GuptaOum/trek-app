@@ -20,6 +20,80 @@ h3 {
     font-weight: bold;
 }
 
+.account-menu {
+    position: relative;
+    margin-left: 8px;
+}
+
+.account-button {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 30px;
+    color: #fff;
+    cursor: pointer;
+    outline: none;
+}
+
+.account-button:hover,
+.account-menu:focus-within .account-button {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.account-button.active-link {
+    color: #ffc107;
+    border-color: #ffc107;
+}
+
+.account-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+    text-align: left;
+}
+
+.account-text small {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.account-caret {
+    margin-left: 6px;
+    font-size: 11px;
+}
+
+.account-list {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    min-width: 180px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 6px 0;
+    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.account-menu:hover .account-list,
+.account-menu:focus-within .account-list {
+    display: block;
+}
+
+.account-list a {
+    display: block;
+    padding: 8px 16px;
+    color: #212529;
+    text-decoration: none;
+}
+
+.account-list a:hover {
+    background-color: #f1f1f1;
+}
+
 .avatar {
     width: 30px;
     height: 30px;

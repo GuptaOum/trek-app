@@ -22,20 +22,36 @@
                 {% else %}
                     <a class="nav-link {% if request.endpoint == 'user_dashboard' %}active-link{% endif %}" href="{{ url_for('user_dashboard') }}">My Bookings</a>
                 {% endif %}
-                <a class="nav-link d-flex align-items-center {% if request.endpoint == 'profile' %}active-link{% endif %}" href="{{ url_for('profile') }}">
-                    {% if user.photo %}
-                    <img src="{{ url_for('static', filename='uploads/' + user.photo) }}" class="avatar me-2">
-                    {% else %}
-                    <span class="avatar avatar-initials me-2">{{ user.name[0]|upper }}</span>
-                    {% endif %}
-                    {{ user.name }}
-                    <span class="badge bg-secondary ms-2">{{ user.role|capitalize }}</span>
-                </a>
-                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                <div class="account-menu">
+                    <span class="account-button {% if request.endpoint == 'profile' %}active-link{% endif %}" tabindex="0" role="button" aria-haspopup="true">
+                        {% if user.photo %}
+                        <img src="{{ url_for('static', filename='uploads/' + user.photo) }}" class="avatar me-2" alt="">
+                        {% else %}
+                        <span class="avatar avatar-initials me-2">{{ user.name[0]|upper }}</span>
+                        {% endif %}
+                        <span class="account-text">
+                            {{ user.name }}
+                            <small>{{ user.role|capitalize }}</small>
+                        </span>
+                        <span class="account-caret">&#9662;</span>
+                    </span>
+                    <div class="account-list">
+                        <a href="{{ url_for('profile') }}">Show profile</a>
+                        <a href="{{ url_for('logout') }}">Logout</a>
+                    </div>
+                </div>
             {% else %}
-                <a class="nav-link {% if request.endpoint == 'login' %}active-link{% endif %}" href="{{ url_for('login') }}">Login</a>
-                <a class="nav-link {% if request.endpoint == 'register' %}active-link{% endif %}" href="{{ url_for('register') }}">Register</a>
-                <a class="nav-link {% if request.endpoint == 'staff_register' %}active-link{% endif %}" href="{{ url_for('staff_register') }}">Join as Staff</a>
+                <div class="account-menu">
+                    <span class="account-button {% if request.endpoint in ['login', 'register', 'staff_register'] %}active-link{% endif %}" tabindex="0" role="button" aria-haspopup="true">
+                        <span class="account-text">Login</span>
+                        <span class="account-caret">&#9662;</span>
+                    </span>
+                    <div class="account-list">
+                        <a href="{{ url_for('login') }}">Login</a>
+                        <a href="{{ url_for('register') }}">Register here</a>
+                        <a href="{{ url_for('staff_register') }}">Join as Staff</a>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>
