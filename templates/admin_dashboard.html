@@ -116,6 +116,37 @@
 {% endif %}
 
 {% if show == 'staff' %}
+<p class="text-muted">
+    {{ total_treks }} treks in total, {{ assigned_count }} with a guide,
+    <b>{{ unassigned|length }} still without one</b>.
+</p>
+
+{% if unassigned %}
+<div class="alert alert-warning">
+    <b>These treks have no guide</b>
+    <div class="table-responsive mt-2">
+    <table class="table table-bordered align-middle mb-0 bg-white">
+    <thead>
+        <tr><th>ID</th><th>Trek</th><th>Location</th><th>Start Date</th><th>Slots</th><th>Status</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+        {% for t in unassigned %}
+        <tr>
+            <td>{{ t.id }}</td>
+            <td><a href="{{ url_for('trek_details', tid=t.id) }}">{{ t.name }}</a></td>
+            <td>{{ t.location }}</td>
+            <td>{{ t.start_date }}</td>
+            <td>{{ t.total_slots - t.available_slots }}/{{ t.total_slots }}</td>
+            <td>{{ t.status }}</td>
+            <td><a href="{{ url_for('assign_staff', tid=t.id) }}" class="btn btn-sm btn-dark">Give to a guide</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+    </div>
+</div>
+{% endif %}
+
 {% if pending %}
 <h5>Waiting for approval</h5>
 <div class="table-responsive">
@@ -292,6 +323,14 @@
 {% endif %}
 
 {% if not show %}
+<div class="mb-3">
+    {% if f == 'unassigned' %}
+    <span class="me-2">Showing only treks without a guide.</span>
+    <a href="{{ url_for('admin_dashboard') }}" class="btn btn-sm btn-dark">Show all treks</a>
+    {% else %}
+    <a href="{{ url_for('admin_dashboard', f='unassigned') }}" class="btn btn-sm btn-outline-dark">Show only treks without a guide</a>
+    {% endif %}
+</div>
 {% if q %}
 <p class="text-muted">{{ treks|length }} trek{% if treks|length != 1 %}s{% endif %} matching "{{ q }}"
     <a href="{{ url_for('admin_dashboard') }}" class="ms-2">Clear search</a></p>

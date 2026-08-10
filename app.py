@@ -129,12 +129,15 @@ def admin_dashboard():
     if session.get('role') != 'admin':
         return redirect(url_for('login'))
     q = request.args.get('q', '')
+    f = request.args.get('f', '')
     treks = Trek.query
     if q:
         if q.isdigit():
             treks = treks.filter_by(id=int(q))
         else:
             treks = treks.filter(Trek.name.like('%' + q + '%'))
+    if f == 'unassigned':
+        treks = treks.filter_by(staff_id=None)
     treks = treks.all()
     pending = User.query.filter_by(role='staff', approved=False).all()
     total_users = User.query.filter_by(role='user').count()
@@ -164,8 +167,12 @@ def admin_dashboard():
                 users = users.filter(User.name.like('%' + q + '%'))
         users = users.all()
     removed = []
+    unassigned = []
+    assigned_count = 0
     if show == 'staff':
         removed = User.query.filter_by(role='staff', fired=True).order_by(User.name).all()
+        unassigned = Trek.query.filter_by(staff_id=None).order_by(Trek.id).all()
+        assigned_count = Trek.query.filter(Trek.staff_id.isnot(None)).count()
     stats = []
     if show == 'staff':
         for s in User.query.filter_by(role='staff', approved=True, fired=False).order_by(User.name).all():
@@ -181,7 +188,8 @@ def admin_dashboard():
                            total_treks=total_treks, total_bookings=total_bookings,
                            show=show, bookings=bookings, staff_list=staff_list, stats=stats,
                            users=users, removed=removed, uid=uid, shown_user=shown_user,
-                           q=q, user=current_user())
+                           unassigned=unassigned, assigned_count=assigned_count,
+                           q=q, f=f, user=current_user())
 
 
 @app.route('/admin/bookings')
